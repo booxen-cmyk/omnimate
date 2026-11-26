@@ -3,7 +3,8 @@ import { supabase } from './lib/supabase';
 import { analyzeMemoWithAI, analyzeMealWithAI, semanticSearchWithAI } from './lib/gemini';
 import {
   Home, FileText, HeartPulse, Store, Search, Mic, Send,
-  ShieldAlert, Smartphone, Droplets, Pill, Sparkles, CheckCircle2, LogOut, Globe, Radio
+  ShieldAlert, Smartphone, Droplets, Pill, Sparkles, CheckCircle2,
+  LogOut, Globe, Radio, Bluetooth, Watch, Cpu, ArrowDownToLine, Activity
 } from 'lucide-react';
 
 // [테스트 모드 스위치] true: 로그인 생략 후 바로 입장 / false: 기존 로그인·회원가입 화면 활성화
@@ -18,9 +19,9 @@ const TRANSLATIONS = {
     passwordPlaceholder: '비밀번호 (6자 이상)',
     loginBtn: '내 비서 시작하기 (로그인)',
     signupBtn: '새 계정 만들기 (무료 가입)',
-    permissionNote: '※ 별도 앱 설치 없이 브라우저 표준 권한(음성·센서)만으로 안전하게 작동합니다.',
-    agentActive: 'AI 에이전트 상시 대기 중 (테스트 모드)',
-    searchPlaceholder: '내 메모·식단 기록이나 궁금한 점을 물어보세요',
+    permissionNote: '※ 갤럭시 안드로이드 표준 센서(모션·자이로·지자기·조도·BLE)와 직결되어 작동합니다.',
+    agentActive: 'GALAXY AI AGENT 상시 대기 (테스트)',
+    searchPlaceholder: '내 메모·식단·센서 기록이나 궁금한 점을 물어보세요',
     searchBtn: '검색',
     briefingTitle: '오늘의 AI 컨텍스트 브리핑',
     calLabel: '섭취 칼로리',
@@ -40,27 +41,32 @@ const TRANSLATIONS = {
     waterBtn: '물 1잔 마시기',
     suppBtn: '영양제 체크',
     suppSub: '터치하여 복용 기록',
-    sensorHeader: '스마트폰 실시간 센서 가디언',
+    sensorHeader: '갤럭시 올-센서 매트릭스 (All-Sensor Matrix)',
     sosTestBtn: '낙상 SOS 테스트',
-    tiltLabel: '기울기(거북목 감지)',
-    accelLabel: '가속도(충격 감지)',
+    openBridgeTitle: '오픈 스마트 기기 연동 허브 (Universal Bridge)',
+    openBridgeDesc: '제조사 API 제휴 없이 표준 BLE 및 모든 외부 JSON/센서 패킷을 OMNI-MATE가 자동 해석해 수용합니다.',
+    bleScanBtn: '블루투스 기기 스캔 (BLE)',
+    bleConnected: '연결된 기기',
+    bleNone: '연결된 외부 기기 없음',
+    rawIngestLabel: '오픈 데이터 패킷 수신기 (타사 워치·센서 JSON 아무 형식 입력)',
+    rawIngestBtn: '오픈 데이터 자동 해석 및 반영',
     storeTitle: '맞춤형 비서 모듈 스토어',
     activeCount: '개 활성화됨',
-    tabs: { home: '홈', memo: 'AI 메모', health: '건강·센서', store: '비서 스토어' },
+    tabs: { home: '홈', memo: 'AI 메모', health: '갤럭시·기기', store: '비서 스토어' },
     postureWarn: '⚠️ 거북목 주의 각도',
     postureOk: '✅ 바른 자세 유지 중',
   },
   en: {
     selectLangTitle: 'Select Your Language',
     selectLangSub: 'Your AI assistant will start immediately in your chosen language.',
-    subtitle: 'Hyper-personalized AI assistant directly on your phone',
+    subtitle: 'Galaxy-First Hyper-Personalized AI Assistant',
     emailPlaceholder: 'Email address',
     passwordPlaceholder: 'Password (6+ chars)',
     loginBtn: 'Start My Assistant (Login)',
     signupBtn: 'Create New Account (Free)',
-    permissionNote: '※ Runs safely using standard mobile web permissions (Voice & Motion) without store approval.',
-    agentActive: 'AI AGENT ACTIVE (TEST MODE)',
-    searchPlaceholder: 'Ask anything about your memos or meal logs...',
+    permissionNote: '※ Directly connects to Android Galaxy hardware sensors (Motion, Gyro, Mag, Light, BLE).',
+    agentActive: 'GALAXY AI AGENT ACTIVE (TEST)',
+    searchPlaceholder: 'Ask anything about your memos, meals, or sensors...',
     searchBtn: 'Ask',
     briefingTitle: "Today's AI Context Briefing",
     calLabel: 'Calories',
@@ -80,27 +86,32 @@ const TRANSLATIONS = {
     waterBtn: 'Drink 1 Cup Water',
     suppBtn: 'Daily Supplement',
     suppSub: 'Tap to log intake',
-    sensorHeader: 'Mobile Live Sensor Guardian',
+    sensorHeader: 'Galaxy Hardware All-Sensor Matrix',
     sosTestBtn: 'Test Fall SOS',
-    tiltLabel: 'Tilt (Posture Check)',
-    accelLabel: 'Accel (Impact Check)',
+    openBridgeTitle: 'Open Smart Device Bridge (Universal Adapter)',
+    openBridgeDesc: 'Accepts standard BLE & any external watch/sensor JSON payload without vendor API lock-in.',
+    bleScanBtn: 'Scan Bluetooth Device (BLE)',
+    bleConnected: 'Connected Device',
+    bleNone: 'No external device connected',
+    rawIngestLabel: 'Open Payload Receiver (Paste any watch/sensor JSON or text)',
+    rawIngestBtn: 'Auto-Parse & Ingest Open Data',
     storeTitle: 'Modular Assistant Store',
     activeCount: ' active',
-    tabs: { home: 'Home', memo: 'AI Memo', health: 'Health', store: 'Store' },
+    tabs: { home: 'Home', memo: 'AI Memo', health: 'Galaxy & IoT', store: 'Store' },
     postureWarn: '⚠️ Neck Tilt Warning',
     postureOk: '✅ Good Posture',
   },
   tl: {
     selectLangTitle: 'Piliin ang Iyong Wika',
     selectLangSub: 'Magsisimula agad ang iyong AI assistant sa napiling wika.',
-    subtitle: 'Personal na AI assistant direkta sa iyong telepono',
+    subtitle: 'Personal na AI assistant para sa Samsung Galaxy',
     emailPlaceholder: 'Email address',
     passwordPlaceholder: 'Password (6+ na karakter)',
     loginBtn: 'Simulan ang AI Assistant (Login)',
     signupBtn: 'Gumawa ng Bagong Account (Libre)',
-    permissionNote: '※ Ligtas na gumagamit ng karaniwang pahintulot sa browser (Boses at Sensor).',
-    agentActive: 'AKTIBO ANG AI AGENT (TEST MODE)',
-    searchPlaceholder: 'Magtanong tungkol sa iyong mga tala o pagkain...',
+    permissionNote: '※ Direktang gumagamit ng mga sensor ng Android Galaxy (Motion, Gyro, Mag, Light, BLE).',
+    agentActive: 'GALAXY AI AGENT AKTIBO (TEST)',
+    searchPlaceholder: 'Magtanong tungkol sa iyong mga tala, pagkain, o sensor...',
     searchBtn: 'Hanapin',
     briefingTitle: 'Buod ng AI Ngayong Araw',
     calLabel: 'Kaloriya',
@@ -120,13 +131,18 @@ const TRANSLATIONS = {
     waterBtn: 'Uminom ng 1 Basong Tubig',
     suppBtn: 'Bitamina / Supplement',
     suppSub: 'Pindutin upang itala',
-    sensorHeader: 'Live Sensor ng Telepono',
+    sensorHeader: 'Galaxy All-Sensor Matrix',
     sosTestBtn: 'Subukan ang Fall SOS',
-    tiltLabel: 'Pagkiling (Postura)',
-    accelLabel: 'Bilis (Pagbagsak)',
+    openBridgeTitle: 'Open Smart Device Bridge (Universal Adapter)',
+    openBridgeDesc: 'Tumatanggap ng standard BLE at anumang external watch/sensor data nang walang vendor lock-in.',
+    bleScanBtn: 'Mag-scan ng Bluetooth Device (BLE)',
+    bleConnected: 'Nakakonektang Device',
+    bleNone: 'Walang nakakonektang device',
+    rawIngestLabel: 'Open Data Receiver (Maglagay ng anumang watch/sensor JSON)',
+    rawIngestBtn: 'Awtomatikong Basahin at Itala',
     storeTitle: 'Tindahan ng mga Modyul',
     activeCount: ' aktibo',
-    tabs: { home: 'Tahanan', memo: 'AI Tala', health: 'Kalusugan', store: 'Tindahan' },
+    tabs: { home: 'Tahanan', memo: 'AI Tala', health: 'Galaxy·IoT', store: 'Tindahan' },
     postureWarn: '⚠️ Babala sa Postura ng Leeg',
     postureOk: '✅ Tamang Postura',
   }
@@ -139,12 +155,12 @@ const QUICK_MEALS = [
 ];
 
 const DEFAULT_MODULES = [
-  { code: 'morning_brief', name: '모닝 데일리 브리핑', desc: '수면·일정·권장 칼로리 아침 요약', category: '생산성', active: true },
-  { code: 'turtle_neck', name: '거북목 경추 각도 알림', desc: '스마트폰 기울기 센서 기반 자세 경고', category: '모바일 센서', active: true },
-  { code: 'fall_sos', name: '낙상 충격 감지 SOS', desc: '급격한 가속도 변화 시 긴급 알림', category: '위험 알리미', active: true },
-  { code: 'eye_fatigue', name: '조도 기반 눈 피로 케어', desc: '어두운 환경 화면 시청 시간 경고', category: '모바일 센서', active: false },
-  { code: 'sub_guard', name: '구독 결제 방어막', desc: '정기 결제일 24시간 전 해지 확인', category: '소비·자산', active: false },
-  { code: 'caffeine_cut', name: '카페인 반감기 알림', desc: '오후 시간대 추가 커피 섭취 경고', category: '건강·습관', active: true },
+  { code: 'galaxy_all_sensor', name: '갤럭시 하드웨어 풀-센서 엔진', desc: '가속도·자이로·중력·지자기·조도·기압계 통합 감시', category: '갤럭시 코어', active: true },
+  { code: 'open_ble_bridge', name: '유니버설 BLE 센서 브릿지', desc: '제조사 무관 표준 블루투스 워치·심박·환경센서 직결', category: '오픈 기기 연동', active: true },
+  { code: 'open_json_ingest', name: '오픈 웹훅·패킷 자동 해석기', desc: '타사 앱·IoT의 비정형 JSON 데이터를 AI가 자동 정규화', category: '오픈 기기 연동', active: true },
+  { code: 'turtle_neck', name: '거북목 경추 각도 알림', desc: '갤럭시 기울기 센서 기반 자세 경고', category: '헬스 가디언', active: true },
+  { code: 'fall_sos', name: '낙상·충격 감지 긴급 SOS', desc: '급격한 가속도 변화 시 비상 알림 발동', category: '안전·위험', active: true },
+  { code: 'eye_fatigue', name: '저조도 시력 보호 케어', desc: '조도 센서(Lux) 기반 어두운 화면 시청 경고', category: '갤럭시 코어', active: true },
 ];
 
 const GUEST_SESSION = {
@@ -183,8 +199,24 @@ export default function App() {
   const [mealInput, setMealInput] = useState('');
   const [loadingAI, setLoadingAI] = useState(false);
 
-  const [sensorData, setSensorData] = useState({ tiltAngle: 15, accelPeak: 1.0, isWarn: true });
+  // 갤럭시 전방위 센서 상태 (모션, 자이로, 중력, 방위/지자기, 조도)
+  const [sensorData, setSensorData] = useState({
+    tiltAngle: 15,
+    rollAngle: 0,
+    compassHeading: 0,
+    accelPeak: 1.0,
+    linearAccel: 0.0,
+    gyroRate: 0.0,
+    lightLux: null,
+    isWarn: true,
+    supportedApis: []
+  });
   const [sosTriggered, setSosTriggered] = useState(false);
+
+  // 외부 오픈 기기 연동 상태
+  const [connectedDevice, setConnectedDevice] = useState(null);
+  const [deviceMetrics, setDeviceMetrics] = useState({ hr: null, battery: null, lastSource: null });
+  const [rawDevicePacket, setRawDevicePacket] = useState('{"source":"GalaxyWatch_Open","heart_rate":78,"steps":5420,"spo2":98}');
 
   function changeLanguage(newLang) {
     setLang(newLang);
@@ -206,34 +238,145 @@ export default function App() {
     return () => subscription.unsubscribe();
   }, []);
 
+  // 갤럭시 하드웨어 센서 통합 리스너 (Legacy Motion/Orientation + W3C Generic Sensor API)
   useEffect(() => {
+    const detected = [];
+    if ('DeviceMotionEvent' in window) detected.push('Accelerometer/Gyro');
+    if ('DeviceOrientationEvent' in window) detected.push('Orientation/Compass');
+    if ('GravitySensor' in window) detected.push('Gravity');
+    if ('LinearAccelerationSensor' in window) detected.push('LinearAccel');
+    if ('Magnetometer' in window) detected.push('Magnetometer');
+    if ('AmbientLightSensor' in window) detected.push('AmbientLight');
+    if ('bluetooth' in navigator) detected.push('WebBLE');
+
+    setSensorData(prev => ({ ...prev, supportedApis: detected }));
+
     const handleOrientation = (e) => {
       const beta = Math.round(e.beta || 15);
+      const gamma = Math.round(e.gamma || 0);
+      const alpha = Math.round(e.alpha || 0);
       const isTurtleNeck = beta > 0 && beta < 35;
       setSensorData(prev => ({
         ...prev,
         tiltAngle: beta,
+        rollAngle: gamma,
+        compassHeading: alpha,
         isWarn: isTurtleNeck
       }));
     };
 
     const handleMotion = (e) => {
       const acc = e.accelerationIncludingGravity;
-      if (!acc) return;
-      const total = Math.sqrt((acc.x || 0) ** 2 + (acc.y || 0) ** 2 + (acc.z || 0) ** 2);
-      if (total > 28) {
-        setSosTriggered(true);
+      const lin = e.acceleration;
+      const rot = e.rotationRate;
+
+      let totalG = 1.0;
+      if (acc) {
+        const total = Math.sqrt((acc.x || 0) ** 2 + (acc.y || 0) ** 2 + (acc.z || 0) ** 2);
+        if (total > 28) setSosTriggered(true);
+        totalG = Number((total / 9.8).toFixed(2));
       }
-      setSensorData(prev => ({ ...prev, accelPeak: Number((total / 9.8).toFixed(2)) }));
+
+      let linVal = 0;
+      if (lin) {
+        linVal = Number(Math.sqrt((lin.x || 0) ** 2 + (lin.y || 0) ** 2 + (lin.z || 0) ** 2).toFixed(2));
+      }
+
+      let gyroVal = 0;
+      if (rot) {
+        gyroVal = Number(Math.sqrt((rot.alpha || 0) ** 2 + (rot.beta || 0) ** 2 + (rot.gamma || 0) ** 2).toFixed(1));
+      }
+
+      setSensorData(prev => ({
+        ...prev,
+        accelPeak: totalG,
+        linearAccel: linVal,
+        gyroRate: gyroVal
+      }));
     };
+
+    // 조도 센서 (삼성 인터넷 / 크롬 플래그 활성 기기)
+    let lightSensor = null;
+    if ('AmbientLightSensor' in window) {
+      try {
+        lightSensor = new window.AmbientLightSensor();
+        lightSensor.addEventListener('reading', () => {
+          setSensorData(prev => ({ ...prev, lightLux: Math.round(lightSensor.illuminance) }));
+        });
+        lightSensor.start();
+      } catch {
+        // 권한 미허용 시 조용히 패스
+      }
+    }
 
     window.addEventListener('deviceorientation', handleOrientation);
     window.addEventListener('devicemotion', handleMotion);
     return () => {
       window.removeEventListener('deviceorientation', handleOrientation);
       window.removeEventListener('devicemotion', handleMotion);
+      if (lightSensor) {
+        try { lightSensor.stop(); } catch {}
+      }
     };
   }, []);
+
+  // 표준 Web Bluetooth API를 통한 오픈 BLE 기기 스캔 및 연결
+  async function handleConnectBLEDevice() {
+    if (!navigator.bluetooth) {
+      return alert('이 브라우저는 Web Bluetooth를 지원하지 않습니다. 갤럭시 크롬 또는 삼성 인터넷에서 실행해 주세요.');
+    }
+    try {
+      const device = await navigator.bluetooth.requestDevice({
+        acceptAllDevices: true,
+        optionalServices: ['heart_rate', 'battery_service', 'environmental_sensing']
+      });
+      setConnectedDevice(device.name || 'Unnamed BLE Sensor');
+      const server = await device.gatt.connect();
+
+      try {
+        const battService = await server.getPrimaryService('battery_service');
+        const battChar = await battService.getCharacteristic('battery_level');
+        const val = await battChar.readValue();
+        setDeviceMetrics(prev => ({ ...prev, battery: val.getUint8(0), lastSource: device.name || 'BLE' }));
+      } catch {
+        setDeviceMetrics(prev => ({ ...prev, lastSource: device.name || 'BLE' }));
+      }
+    } catch (err) {
+      if (err.name !== 'NotFoundError') {
+        alert('블루투스 연결 안내: ' + err.message);
+      }
+    }
+  }
+
+  // 어떤 형식의 외부 JSON/센서 데이터든 자동 파싱하여 OMNI-MATE 규격으로 흡수
+  async function handleIngestOpenPacket() {
+    if (!rawDevicePacket.trim()) return;
+    try {
+      const parsed = JSON.parse(rawDevicePacket);
+      const hr = parsed.heart_rate || parsed.hr || parsed.bpm || parsed.heartRate || null;
+      const battery = parsed.battery || parsed.batt || null;
+      const source = parsed.source || parsed.device || 'Open-IoT-Packet';
+
+      setDeviceMetrics({ hr, battery, lastSource: source });
+      setConnectedDevice(source);
+
+      const newLog = {
+        id: Date.now(),
+        user_id: session.user.id,
+        log_type: 'device_sync',
+        title: `[${source}] ${Object.entries(parsed).map(([k, v]) => `${k}:${v}`).join(', ')}`
+      };
+
+      const updated = [newLog, ...healthLogs];
+      setHealthLogs(updated);
+      if (BYPASS_AUTH) {
+        localStorage.setItem('omni_guest_health', JSON.stringify(updated));
+      }
+      alert(`✅ [${source}] 오픈 패킷 해석 및 동기화 완료!`);
+    } catch {
+      alert('JSON 형식을 확인해 주세요. 예: {"source":"Watch","bpm":80}');
+    }
+  }
 
   async function fetchUserData(userId) {
     const { data: memoData } = await supabase.from('memos').select('*').eq('user_id', userId).order('created_at', { ascending: false });
@@ -421,7 +564,7 @@ export default function App() {
     );
   }
 
-  // 2단계: BYPASS_AUTH가 false일 때만 로그인/회원가입 화면 표시 (코드 보존)
+  // 2단계: BYPASS_AUTH가 false일 때만 로그인/회원가입 화면 표시
   if (!session) {
     return (
       <div className="min-h-[100dvh] flex flex-col items-center justify-center p-5 bg-[#090d16] select-none">
@@ -438,7 +581,7 @@ export default function App() {
               </h1>
             </div>
             <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2 py-0.5 rounded-full font-medium">
-              v0.2 Mobile
+              v0.4 Galaxy-Core
             </span>
           </div>
           <p className="text-xs text-slate-400 mb-6">{t.subtitle}</p>
@@ -543,7 +686,7 @@ export default function App() {
                 <span className="text-[11px] text-slate-300">{sensorData.isWarn ? t.postureWarn : t.postureOk}</span>
               </div>
               <p className="text-xs text-slate-300 leading-relaxed">
-                Calories: <strong className="text-cyan-400">{totalCalories} kcal</strong> / 2,000 kcal · Water: <strong className="text-blue-400">{waterCups}</strong> · Memos: <strong>{memos.length}</strong>
+                Calories: <strong className="text-cyan-400">{totalCalories} kcal</strong> · Water: <strong className="text-blue-400">{waterCups}</strong> · Galaxy Sensors: <strong className="text-emerald-400">{sensorData.supportedApis.length} Active</strong>
               </p>
             </div>
 
@@ -561,7 +704,7 @@ export default function App() {
               <div className="bg-slate-900 border border-slate-800 rounded-2xl p-3 text-center">
                 <div className="text-[11px] text-slate-400 mb-1">{t.neckLabel}</div>
                 <div className="text-base font-bold text-purple-400">{sensorData.tiltAngle}°</div>
-                <div className="text-[10px] text-slate-500">Sensor</div>
+                <div className="text-[10px] text-slate-500">Gyro/Pitch</div>
               </div>
             </div>
 
@@ -633,6 +776,96 @@ export default function App() {
 
         {activeTab === 'health' && (
           <div className="space-y-4">
+            {/* 갤럭시 올-센서 매트릭스 */}
+            <div className="bg-slate-900 border border-purple-500/40 rounded-2xl p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-purple-300 flex items-center gap-1.5">
+                  <Activity className="w-4 h-4" /> {t.sensorHeader}
+                </span>
+                <button onClick={() => setSosTriggered(true)} className="text-[10px] bg-red-500/20 text-red-400 px-2.5 py-1 rounded-full font-semibold">
+                  {t.sosTestBtn}
+                </button>
+              </div>
+
+              {/* 감지된 갤럭시 하드웨어 API 배지 */}
+              <div className="flex flex-wrap gap-1">
+                {sensorData.supportedApis.map((api, idx) => (
+                  <span key={idx} className="text-[10px] bg-purple-950/80 border border-purple-500/30 text-purple-200 px-2 py-0.5 rounded-md">
+                    ● {api}
+                  </span>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="bg-slate-800/70 p-2.5 rounded-xl">
+                  <div className="text-[10px] text-slate-400">자이로·기울기 (Pitch/Roll)</div>
+                  <div className="font-bold text-white mt-0.5">{sensorData.tiltAngle}° / {sensorData.rollAngle}°</div>
+                  <div className="text-[10px] text-cyan-300 mt-0.5">{sensorData.isWarn ? t.postureWarn : t.postureOk}</div>
+                </div>
+                <div className="bg-slate-800/70 p-2.5 rounded-xl">
+                  <div className="text-[10px] text-slate-400">가속도·중력 / 선형가속</div>
+                  <div className="font-bold text-white mt-0.5">{sensorData.accelPeak} G / {sensorData.linearAccel} m/s²</div>
+                  <div className="text-[10px] text-emerald-400 mt-0.5">회전속도: {sensorData.gyroRate} °/s</div>
+                </div>
+                <div className="bg-slate-800/70 p-2.5 rounded-xl">
+                  <div className="text-[10px] text-slate-400">지자기 방위각 (Compass)</div>
+                  <div className="font-bold text-white mt-0.5">{sensorData.compassHeading}° N</div>
+                </div>
+                <div className="bg-slate-800/70 p-2.5 rounded-xl">
+                  <div className="text-[10px] text-slate-400">조도(Lux) · 기압/폴드</div>
+                  <div className="font-bold text-white mt-0.5">
+                    {sensorData.lightLux !== null ? `${sensorData.lightLux} lx` : 'Native Bridge 대기'}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 오픈 스마트 기기 연동 허브 */}
+            <div className="bg-gradient-to-br from-slate-900 to-cyan-950/30 border border-cyan-500/40 rounded-2xl p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-cyan-300 flex items-center gap-1.5">
+                  <Watch className="w-4 h-4" /> {t.openBridgeTitle}
+                </span>
+                <span className="text-[10px] bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded-full">OPEN</span>
+              </div>
+              <p className="text-[11px] text-slate-300 leading-relaxed">{t.openBridgeDesc}</p>
+
+              <div className="flex items-center justify-between bg-slate-900/80 border border-slate-800 rounded-xl p-3">
+                <div className="text-xs">
+                  <div className="text-[10px] text-slate-400">{t.bleConnected}</div>
+                  <div className="font-semibold text-white mt-0.5">
+                    {connectedDevice || t.bleNone}
+                    {deviceMetrics.hr ? ` · ❤️ ${deviceMetrics.hr} bpm` : ''}
+                    {deviceMetrics.battery ? ` · 🔋 ${deviceMetrics.battery}%` : ''}
+                  </div>
+                </div>
+                <button
+                  onClick={handleConnectBLEDevice}
+                  className="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-3 py-2 rounded-xl text-[11px] flex items-center gap-1 shrink-0"
+                >
+                  <Bluetooth className="w-3.5 h-3.5" /> {t.bleScanBtn}
+                </button>
+              </div>
+
+              <div className="pt-1">
+                <div className="text-[10px] text-slate-400 mb-1 flex items-center gap-1">
+                  <Cpu className="w-3 h-3 text-cyan-400" /> {t.rawIngestLabel}
+                </div>
+                <textarea
+                  rows={2}
+                  value={rawDevicePacket}
+                  onChange={(e) => setRawDevicePacket(e.target.value)}
+                  className="w-full bg-slate-950/80 border border-slate-800 rounded-xl p-2.5 text-[11px] font-mono text-cyan-200 focus:outline-none mb-2"
+                />
+                <button
+                  onClick={handleIngestOpenPacket}
+                  className="w-full bg-slate-800 hover:bg-slate-700 border border-cyan-500/30 text-cyan-300 font-semibold py-2 rounded-xl text-[11px] flex items-center justify-center gap-1.5"
+                >
+                  <ArrowDownToLine className="w-3.5 h-3.5" /> {t.rawIngestBtn}
+                </button>
+              </div>
+            </div>
+
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-semibold text-emerald-400">{t.mealHeader}</span>
@@ -683,27 +916,6 @@ export default function App() {
                   <div className="text-[10px] text-slate-400">{t.suppSub}</div>
                 </div>
               </button>
-            </div>
-
-            <div className="bg-slate-900 border border-purple-500/30 rounded-2xl p-4">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-semibold text-purple-300 flex items-center gap-1.5">
-                  <Smartphone className="w-4 h-4" /> {t.sensorHeader}
-                </span>
-                <button onClick={() => setSosTriggered(true)} className="text-[10px] bg-red-500/20 text-red-400 px-2.5 py-1 rounded-full">
-                  {t.sosTestBtn}
-                </button>
-              </div>
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <div className="bg-slate-800/70 p-2.5 rounded-xl">
-                  <div className="text-[10px] text-slate-400">{t.tiltLabel}</div>
-                  <div className="font-bold text-white mt-0.5">{sensorData.tiltAngle}° ({sensorData.isWarn ? t.postureWarn : t.postureOk})</div>
-                </div>
-                <div className="bg-slate-800/70 p-2.5 rounded-xl">
-                  <div className="text-[10px] text-slate-400">{t.accelLabel}</div>
-                  <div className="font-bold text-white mt-0.5">{sensorData.accelPeak} G</div>
-                </div>
-              </div>
             </div>
           </div>
         )}
