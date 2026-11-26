@@ -11,6 +11,8 @@ const BYPASS_AUTH = true;
 
 const TRANSLATIONS = {
   ko: {
+    selectLangTitle: '언어를 선택하세요',
+    selectLangSub: '선택한 언어로 AI 비서가 즉시 시작됩니다.',
     subtitle: '플랫폼 없이 내 폰에 바로 심는 초개인화 AI 비서',
     emailPlaceholder: '이메일 주소',
     passwordPlaceholder: '비밀번호 (6자 이상)',
@@ -49,6 +51,8 @@ const TRANSLATIONS = {
     postureOk: '✅ 바른 자세 유지 중',
   },
   en: {
+    selectLangTitle: 'Select Your Language',
+    selectLangSub: 'Your AI assistant will start immediately in your chosen language.',
     subtitle: 'Hyper-personalized AI assistant directly on your phone',
     emailPlaceholder: 'Email address',
     passwordPlaceholder: 'Password (6+ chars)',
@@ -86,43 +90,45 @@ const TRANSLATIONS = {
     postureWarn: '⚠️ Neck Tilt Warning',
     postureOk: '✅ Good Posture',
   },
-  ja: {
-    subtitle: 'プラットフォーム不要、スマホに直接入れる超個人化AI秘書',
-    emailPlaceholder: 'メールアドレス',
-    passwordPlaceholder: 'パスワード（6文字以上）',
-    loginBtn: 'AI秘書を起動（ログイン）',
-    signupBtn: '新規アカウント作成（無料）',
-    permissionNote: '※ ストア審査不要でブラウザ標準権限（音声・センサー）のみで安全に動作します。',
-    agentActive: 'AIエージェント常時待機中（テスト）',
-    searchPlaceholder: 'メモや食事記録についてAIに質問する...',
-    searchBtn: '検索',
-    briefingTitle: '本日のAIコンテキストブリーフィング',
-    calLabel: '摂取カロリー',
-    waterLabel: '水分摂取',
-    neckLabel: '首の角度',
-    recentMemoTitle: '最近のAI要約メモ',
-    memoHeader: '音声・テキスト自動要約メモ',
-    voiceBtn: '音声入力',
-    memoPlaceholder: '会議内容やアイデアを自由に入力してください。AIが要約・タグ・ToDoを自動抽出します。',
-    saveMemoBtn: 'AI自動整理して保存',
-    savingBtn: 'AI分析・保存中...',
-    mealHeader: 'AI自然言語食事・カロリー計算',
-    voiceMealBtn: '音声で記録',
-    mealPlaceholder: '例：昼食にサラダチキンとさつまいもを食べた',
-    logBtn: '記録',
-    quickMealLabel: 'ワンタップ定番メニュー',
-    waterBtn: '水を1杯飲む',
-    suppBtn: 'サプリ記録',
-    suppSub: 'タップして摂取を記録',
-    sensorHeader: 'スマホリアルタイムセンサー',
-    sosTestBtn: '転倒SOSテスト',
-    tiltLabel: '傾き（ストレートネック検知）',
-    accelLabel: '加速度（衝撃検知）',
-    storeTitle: 'カスタム秘書モジュールストア',
-    activeCount: '個有効',
-    tabs: { home: 'ホーム', memo: 'AIメモ', health: '健康・センサー', store: 'ストア' },
-    postureWarn: '⚠️ 首の角度注意',
-    postureOk: '✅ 正しい姿勢を維持中',
+  tl: {
+    selectLangTitle: 'Piliin ang Iyong Wika',
+    selectLangSub: 'Magsisimula agad ang iyong AI assistant sa napiling wika.',
+    subtitle: 'Personal na AI assistant direkta sa iyong telepono',
+    emailPlaceholder: 'Email address',
+    passwordPlaceholder: 'Password (6+ na karakter)',
+    loginBtn: 'Simulan ang AI Assistant (Login)',
+    signupBtn: 'Gumawa ng Bagong Account (Libre)',
+    permissionNote: '※ Ligtas na gumagamit ng karaniwang pahintulot sa browser (Boses at Sensor).',
+    agentActive: 'AKTIBO ANG AI AGENT (TEST MODE)',
+    searchPlaceholder: 'Magtanong tungkol sa iyong mga tala o pagkain...',
+    searchBtn: 'Hanapin',
+    briefingTitle: 'Buod ng AI Ngayong Araw',
+    calLabel: 'Kaloriya',
+    waterLabel: 'Tubig',
+    neckLabel: 'Anggulo ng Leeg',
+    recentMemoTitle: 'Mga Kamakailang Buod ng AI',
+    memoHeader: 'Awtomatikong Buod ng Boses at Teksto',
+    voiceBtn: 'Boses',
+    memoPlaceholder: 'Isulat ang iyong mga ideya o gawain. Aayusin ito ng AI para sa iyo.',
+    saveMemoBtn: 'Ayusin at I-save gamit ang AI',
+    savingBtn: 'Sinusuri ng AI...',
+    mealHeader: 'AI Tagasubaybay ng Pagkain at Kaloriya',
+    voiceMealBtn: 'Itala gamit ang Boses',
+    mealPlaceholder: 'Hal: Kumain ako ng chicken salad at kamote para sa tanghalian',
+    logBtn: 'Itala',
+    quickMealLabel: 'Mabilisang Pagpili ng Pagkain',
+    waterBtn: 'Uminom ng 1 Basong Tubig',
+    suppBtn: 'Bitamina / Supplement',
+    suppSub: 'Pindutin upang itala',
+    sensorHeader: 'Live Sensor ng Telepono',
+    sosTestBtn: 'Subukan ang Fall SOS',
+    tiltLabel: 'Pagkiling (Postura)',
+    accelLabel: 'Bilis (Pagbagsak)',
+    storeTitle: 'Tindahan ng mga Modyul',
+    activeCount: ' aktibo',
+    tabs: { home: 'Tahanan', memo: 'AI Tala', health: 'Kalusugan', store: 'Tindahan' },
+    postureWarn: '⚠️ Babala sa Postura ng Leeg',
+    postureOk: '✅ Tamang Postura',
   }
 };
 
@@ -147,6 +153,7 @@ const GUEST_SESSION = {
 
 export default function App() {
   const [lang, setLang] = useState(() => localStorage.getItem('omni_lang') || 'ko');
+  const [hasSelectedLang, setHasSelectedLang] = useState(() => Boolean(localStorage.getItem('omni_lang')));
   const t = TRANSLATIONS[lang] || TRANSLATIONS.ko;
 
   const [session, setSession] = useState(BYPASS_AUTH ? GUEST_SESSION : null);
@@ -182,6 +189,7 @@ export default function App() {
   function changeLanguage(newLang) {
     setLang(newLang);
     localStorage.setItem('omni_lang', newLang);
+    setHasSelectedLang(true);
   }
 
   useEffect(() => {
@@ -249,7 +257,7 @@ export default function App() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) return alert('이 브라우저는 음성 인식을 지원하지 않습니다. (Chrome/삼성인터넷 권장)');
     const recognition = new SpeechRecognition();
-    recognition.lang = lang === 'en' ? 'en-US' : lang === 'ja' ? 'ja-JP' : 'ko-KR';
+    recognition.lang = lang === 'en' ? 'en-US' : lang === 'tl' ? 'fil-PH' : 'ko-KR';
     recognition.onresult = (e) => targetSetter(e.results[0][0].transcript);
     recognition.start();
   }
@@ -355,16 +363,16 @@ export default function App() {
 
   const LanguageSelector = () => (
     <div className="flex items-center gap-1 bg-slate-800/90 border border-slate-700/80 rounded-full p-1">
-      <Globe className="w-3.5 h-3.5 text-cyan-400 ml-1.5 mr-0.5" />
+      <Globe className="w-3.5 h-3.5 text-cyan-400 ml-1.5 mr-0.5 shrink-0" />
       {[
         { code: 'ko', label: '한국어' },
         { code: 'en', label: 'EN' },
-        { code: 'ja', label: '日本語' },
+        { code: 'tl', label: 'Tagalog' },
       ].map((item) => (
         <button
           key={item.code}
           onClick={() => changeLanguage(item.code)}
-          className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all ${
+          className={`px-2 py-1 rounded-full text-[11px] font-semibold transition-all ${
             lang === item.code
               ? 'bg-cyan-500 text-slate-950 shadow-sm'
               : 'text-slate-400 hover:text-white'
@@ -376,7 +384,44 @@ export default function App() {
     </div>
   );
 
-  // BYPASS_AUTH가 false일 때만 로그인/회원가입 화면 표시 (코드 보존)
+  // 1단계: 최초 진입 시 언어 선택 화면
+  if (!hasSelectedLang) {
+    return (
+      <div className="min-h-[100dvh] flex flex-col items-center justify-center p-6 bg-[#090d16] select-none">
+        <div className="w-full max-w-sm bg-slate-900/95 border border-slate-800 rounded-3xl p-7 shadow-2xl text-center">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 mb-4">
+            <Globe className="w-6 h-6 text-cyan-400" />
+          </div>
+          <h1 className="text-xl font-bold text-white mb-1">OMNI-MATE</h1>
+          <p className="text-xs text-slate-400 mb-6">
+            언어 선택 / Select Language / Piliin ang Wika
+          </p>
+
+          <div className="space-y-3">
+            {[
+              { code: 'ko', title: '한국어', sub: 'Korean · 한국어로 시작하기' },
+              { code: 'en', title: 'English', sub: '영어 · Start in English' },
+              { code: 'tl', title: 'Tagalog', sub: '타갈로그어 · Simulan sa Tagalog' },
+            ].map((item) => (
+              <button
+                key={item.code}
+                onClick={() => changeLanguage(item.code)}
+                className="w-full bg-slate-800 hover:bg-slate-700/90 active:scale-[0.99] border border-slate-700 hover:border-cyan-500/50 rounded-2xl p-4 flex items-center justify-between transition-all text-left"
+              >
+                <div>
+                  <div className="text-base font-bold text-white">{item.title}</div>
+                  <div className="text-[11px] text-slate-400 mt-0.5">{item.sub}</div>
+                </div>
+                <span className="text-cyan-400 text-sm font-bold">→</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 2단계: BYPASS_AUTH가 false일 때만 로그인/회원가입 화면 표시 (코드 보존)
   if (!session) {
     return (
       <div className="min-h-[100dvh] flex flex-col items-center justify-center p-5 bg-[#090d16] select-none">
@@ -433,6 +478,7 @@ export default function App() {
     );
   }
 
+  // 3단계: 메인 대시보드
   return (
     <div className="max-w-md mx-auto min-h-[100dvh] bg-[#090d16] pb-24 relative">
       {sosTriggered && (
@@ -446,15 +492,15 @@ export default function App() {
         </div>
       )}
 
-      <header className="sticky top-0 z-30 bg-[#090d16]/90 backdrop-blur-md px-4 pt-4 pb-3 flex items-center justify-between border-b border-slate-800/80">
-        <div>
+      <header className="sticky top-0 z-30 bg-[#090d16]/90 backdrop-blur-md px-4 pt-4 pb-3 flex items-center justify-between border-b border-slate-800/80 gap-2">
+        <div className="min-w-0">
           <div className="flex items-center gap-1.5">
-            <Radio className="w-3 h-3 text-emerald-400 animate-pulse" />
-            <span className="text-[10px] font-semibold tracking-wider text-emerald-400">{t.agentActive}</span>
+            <Radio className="w-3 h-3 text-emerald-400 animate-pulse shrink-0" />
+            <span className="text-[10px] font-semibold tracking-wider text-emerald-400 truncate">{t.agentActive}</span>
           </div>
           <h1 className="text-lg font-bold text-white">OMNI-MATE</h1>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 shrink-0">
           <LanguageSelector />
           {!BYPASS_AUTH && (
             <button onClick={() => supabase.auth.signOut()} className="p-2 text-slate-400 hover:text-white">
