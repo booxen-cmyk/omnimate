@@ -5,11 +5,11 @@ import {
   Home, FileText, HeartPulse, Store, Search, Mic, Send,
   ShieldAlert, Droplets, Pill, Sparkles, CheckCircle2,
   LogOut, Globe, Radio, Bluetooth, Watch, Cpu, ArrowDownToLine,
-  Activity, BookOpen, Video, Baby, Volume2, ShieldCheck
+  Activity, BookOpen, Video, Baby, Volume2, ShieldCheck, PlusCircle, Users, Play
 } from 'lucide-react';
 
 // [버전 관리] 0.1씩 조금씩 진화하는 빌드 체계
-const APP_VERSION = 'v0.3.5';
+const APP_VERSION = 'v0.4.0';
 
 // [테스트 모드 스위치] true: 로그인 생략 후 바로 입장 / false: 기존 로그인·회원가입 화면 활성화
 const BYPASS_AUTH = true;
@@ -54,10 +54,10 @@ const TRANSLATIONS = {
     bleNone: '연결된 외부 기기 없음',
     rawIngestLabel: '오픈 데이터 패킷 수신기 (타사 워치·센서 JSON 아무 형식 입력)',
     rawIngestBtn: '오픈 데이터 자동 해석 및 반영',
-    storeTitle: '무광고 모듈형 비서 스토어',
-    storeSub: '기본 엔진은 평생 무료 · 필요한 키즈/전문가 모듈만 선택 장착',
+    storeTitle: 'B2P2P AI 캐릭터 · 모듈 마켓',
+    storeSub: '오리지널 캐릭터 장착 & 내가 만든 AI 캐릭터 거래소',
     activeCount: '개 장착됨',
-    tabs: { home: '홈', memo: 'AI 메모', health: '갤럭시·기기', store: '비서 스토어' },
+    tabs: { home: '홈', memo: 'AI 메모', health: '갤럭시·기기', store: '캐릭터 마켓' },
     postureWarn: '⚠️ 거북목 주의 각도',
     postureOk: '✅ 바른 자세 유지 중',
   },
@@ -100,10 +100,10 @@ const TRANSLATIONS = {
     bleNone: 'No external device connected',
     rawIngestLabel: 'Open Payload Receiver (Paste any watch/sensor JSON or text)',
     rawIngestBtn: 'Auto-Parse & Ingest Open Data',
-    storeTitle: 'Ad-Free Modular Assistant Store',
-    storeSub: 'Core engine free forever · Equip only the Kids & Pro packs you need',
+    storeTitle: 'B2P2P AI Character & Module Market',
+    storeSub: 'Equip official characters or publish & trade your own AI personas',
     activeCount: ' equipped',
-    tabs: { home: 'Home', memo: 'AI Memo', health: 'Galaxy & IoT', store: 'Store' },
+    tabs: { home: 'Home', memo: 'AI Memo', health: 'Galaxy & IoT', store: 'Market' },
     postureWarn: '⚠️ Neck Tilt Warning',
     postureOk: '✅ Good Posture',
   },
@@ -146,10 +146,10 @@ const TRANSLATIONS = {
     bleNone: 'Walang nakakonektang device',
     rawIngestLabel: 'Open Data Receiver (Maglagay ng anumang watch/sensor JSON)',
     rawIngestBtn: 'Awtomatikong Basahin at Itala',
-    storeTitle: 'Walang-Ads na Tindahan ng Modyul',
-    storeSub: 'Libreng core engine · Piliin lamang ang Kids at Pro packs na kailangan',
+    storeTitle: 'B2P2P AI Character & Module Market',
+    storeSub: 'Pumili ng AI character o ibenta ang sarili mong likha',
     activeCount: ' aktibo',
-    tabs: { home: 'Tahanan', memo: 'AI Tala', health: 'Galaxy·IoT', store: 'Tindahan' },
+    tabs: { home: 'Tahanan', memo: 'AI Tala', health: 'Galaxy·IoT', store: 'Merkado' },
     postureWarn: '⚠️ Babala sa Postura ng Leeg',
     postureOk: '✅ Tamang Postura',
   }
@@ -161,64 +161,161 @@ const QUICK_MEALS = [
   { title: '아메리카노 (카페인 기록)', calories: 10, carbs: 2, protein: 0, fat: 0 },
 ];
 
-const DEFAULT_MODULES = [
-  // KIDS & FAMILY PACK (핵심 수익 모델)
+// 오리지널 고퀄리티 키즈·헬스·통역 캐릭터 15종 + 기본 코어 엔진
+const INITIAL_CHARACTERS = [
+  // [KIDS 5종]
   {
-    code: 'kids_storyteller',
-    name: '원격 AI 맞춤 동화 읽어주기',
-    desc: '아이 이름·관심사를 넣어 즉석 동화를 짓고 부모 목소리 톤(TTS)으로 원격 낭독',
-    category: '키즈·패밀리 케어',
-    tier: 'KIDS PACK',
+    code: 'kids_1',
+    group: 'kids',
+    name: '별빛 동화 이모 루나',
+    creator: 'OMNI Official',
+    price: 'FREE',
+    desc: '아이 이름과 오늘 있었던 일을 넣어 포근한 잠자리 창작 동화를 들려줍니다.',
+    sampleVoice: '안녕 꼬마 탐험가! 오늘 하루도 정말 씩씩했어. 이제 포근한 별빛 나라로 여행을 떠나볼까?',
     active: true
   },
   {
-    code: 'kids_home_cctv',
-    name: '오픈 홈 CCTV 직결 뷰어',
-    desc: '제조사 무관 IP카메라·구형폰 홈캠 스트림 연결 및 이상 움직임/울음소리 감지',
-    category: '키즈·패밀리 케어',
-    tier: 'KIDS PACK',
-    active: true
-  },
-  {
-    code: 'kids_safety_guard',
-    name: '아이 안전·등하원 안심 가디언',
-    desc: '키즈 워치·BLE 태그·스마트폰 센서 연동 실시간 안심존 및 긴급 호출',
-    category: '키즈·패밀리 케어',
-    tier: 'KIDS PACK',
-    active: true
-  },
-  // FREE FOREVER CORE (무광고 영구 무료 뼈대)
-  {
-    code: 'galaxy_all_sensor',
-    name: '갤럭시 하드웨어 풀-센서 엔진',
-    desc: '가속도·자이로·중력·지자기·조도·기압계 통합 감시',
-    category: '갤럭시 코어',
-    tier: 'FREE FOREVER',
-    active: true
-  },
-  {
-    code: 'open_ble_bridge',
-    name: '유니버설 오픈 BLE · JSON 브릿지',
-    desc: '제조사 API 제휴 없이 모든 스마트워치·센서 패킷 자동 수용',
-    category: '오픈 기기 연동',
-    tier: 'FREE FOREVER',
-    active: true
-  },
-  // PRO / CREATOR PACK (전문가·생활 특화 모듈)
-  {
-    code: 'multilingual_interpreter',
-    name: '3개국어(한·영·타갈로그) 실시간 통역 팩',
-    desc: '병원·관공서·로컬 생활 상황별 즉시 음성 통역 및 문화 가이드',
-    category: '글로벌 컨텐츠',
-    tier: 'PRO PACK',
+    code: 'kids_2',
+    group: 'kids',
+    name: '공룡 박사 티라노 쌤',
+    creator: 'OMNI Official',
+    price: '1,500원',
+    desc: '공룡·우주·자연 호기심 질문에 눈높이 퀴즈와 효과음 톤으로 대답하는 놀이 친구입니다.',
+    sampleVoice: '크앙! 티라노사우루스의 이빨은 바나나만큼 크다는 사실, 알고 있었니? 다음 퀴즈 나간다!',
     active: false
   },
   {
-    code: 'bio_weather_coach',
-    name: '기압·조도 바이오리듬 코치',
-    desc: '갤럭시 기압계·조도 센서 기반 저기압 컨디션 및 수면 리듬 케어',
-    category: '헬스 스페셜',
-    tier: 'PRO PACK',
+    code: 'kids_3',
+    group: 'kids',
+    name: '양치·정리정돈 히어로 캡틴',
+    creator: 'OMNI Official',
+    price: '1,000원',
+    desc: '3분 양치 타이머와 장난감 정리 미션을 게임처럼 응원해 주는 생활 습관 코치입니다.',
+    sampleVoice: '치카치카 대작전 시작! 윗니 아랫니 반짝반짝 닦으면 오늘의 히어로 배지를 줄게!',
+    active: false
+  },
+  {
+    code: 'kids_4',
+    group: 'kids',
+    name: '하원·귀가 안전 수호천사 미호',
+    creator: 'OMNI Official',
+    price: '2,000원',
+    desc: '구형 폰 홈캠·키즈 워치 연동으로 아이 귀가 감지 및 비상 호출을 보호자에게 알립니다.',
+    sampleVoice: '우리 아이가 안전하게 집에 도착했어요. 지금 거실 홈캠과 안전존이 정상 작동 중입니다.',
+    active: true
+  },
+  {
+    code: 'kids_5',
+    group: 'kids',
+    name: '영어·타갈로그어 놀이 친구 코코',
+    creator: 'OMNI Official',
+    price: '1,500원',
+    desc: '아이와 인사말·동물·숫자를 한국어·영어·타갈로그어 노래와 퀴즈로 놀아줍니다.',
+    sampleVoice: '안녕! 영어로 Hello, 타갈로그어로는 Kumusta! 오늘 우리 같이 세 가지 인사를 외쳐보자!',
+    active: false
+  },
+
+  // [HEALTH 5종]
+  {
+    code: 'health_1',
+    group: 'health',
+    name: '스파르타 식단·근성장 코치 강팀장',
+    creator: 'OMNI Official',
+    price: '2,000원',
+    desc: '야식·당류를 칼같이 지적하고 단백질·칼로리 목표를 냉정하게 관리해 주는 PT 트레이너입니다.',
+    sampleVoice: '잠깐, 지금 그 야식 진짜 먹을 겁니까? 오늘 단백질 20g 부족합니다. 물 한 잔 마시고 참으세요!',
+    active: false
+  },
+  {
+    code: 'health_2',
+    group: 'health',
+    name: '거북목·자세 교정 물리치료사 정원장',
+    creator: 'OMNI Official',
+    price: 'FREE',
+    desc: '갤럭시 자이로·기울기 센서와 연동해 고개가 숙여질 때마다 스트레칭을 안내합니다.',
+    sampleVoice: '목 각도가 25도 아래로 숙여졌습니다. 지금 화면을 눈높이로 올리고 어깨를 5초간 뒤로 젖혀주세요.',
+    active: true
+  },
+  {
+    code: 'health_3',
+    group: 'health',
+    name: '제주·로컬 제철 미식 영양사 소담',
+    creator: 'OMNI Official',
+    price: '1,500원',
+    desc: '기록된 식단과 활동량을 분석해 자극적이지 않고 속 편한 한식·제철 식단을 추천합니다.',
+    sampleVoice: '오늘 활동량이 많으셨네요. 저녁에는 소화가 잘 되는 따뜻한 국수와 단백질 반찬을 곁들여 보세요.',
+    active: false
+  },
+  {
+    code: 'health_4',
+    group: 'health',
+    name: '저기압·수면 바이오리듬 케어 달빛',
+    creator: 'OMNI Official',
+    price: '1,500원',
+    desc: '갤럭시 조도·기압 센서와 워치 심박수를 결합해 취침 루틴과 컨디션 저하를 미리 챙깁니다.',
+    sampleVoice: '주변 조도가 낮아졌어요. 스마트폰 블루라이트를 줄이고 내일 아침을 위해 심호흡을 시작할 시간입니다.',
+    active: false
+  },
+  {
+    code: 'health_5',
+    group: 'health',
+    name: '부모님 안심 복약·낙상 가디언 효심이',
+    creator: 'OMNI Official',
+    price: '2,000원',
+    desc: '영양제·혈압약 복용 알림과 가속도계 낙상 충격 SOS 감지를 다정한 목소리로 수행합니다.',
+    sampleVoice: '어르신, 아침 식사 후 드실 영양제 시간입니다. 혹시 어지러우시면 언제든 화면을 눌러주세요.',
+    active: false
+  },
+
+  // [INTERPRETER 5종]
+  {
+    code: 'interp_1',
+    group: 'interpreter',
+    name: '마닐라·세부 로컬 생활 통역사 마리아',
+    creator: 'OMNI Official',
+    price: '2,000원',
+    desc: '필리핀 현지 관공서, 은행, 부동산, 생활 민원 상황에서 자연스러운 타갈로그어·영어를 통역합니다.',
+    sampleVoice: 'Magandang araw po! 현지 담당자에게 정중하고 정확하게 요청 사항을 전달해 드릴게요.',
+    active: true
+  },
+  {
+    code: 'interp_2',
+    group: 'interpreter',
+    name: '해외 병원·응급실 의료 통역 전문의 닥터 한',
+    creator: 'OMNI Official',
+    price: '2,500원',
+    desc: '증상, 알레르기, 복용 약물, 통증 부위를 현지 의료진이 바로 이해할 수 있는 의학 용어로 전달합니다.',
+    sampleVoice: '증상을 한국어로 편하게 말씀하세요. 현지 의사가 즉시 진료할 수 있도록 정확한 영어와 현지어로 바꿔드릴게요.',
+    active: false
+  },
+  {
+    code: 'interp_3',
+    group: 'interpreter',
+    name: '글로벌 비즈니스 협상·계약 비서 제임스',
+    creator: 'OMNI Official',
+    price: '3,000원',
+    desc: '파트너 미팅, 단가 협상, 이메일 초안 작성 시 격식 있고 설득력 있는 비즈니스 영어를 구사합니다.',
+    sampleVoice: '상대방의 제안을 정중하게 조율하면서도 우리의 핵심 조건을 지키는 비즈니스 표현으로 정리했습니다.',
+    active: false
+  },
+  {
+    code: 'interp_4',
+    group: 'interpreter',
+    name: '미식·식당 주문 & 알레르기 필터 셰프 켄',
+    creator: 'OMNI Official',
+    price: '1,000원',
+    desc: '해외 로컬 식당 메뉴판 해석, 맵기/고수/알레르기 제외 요청을 현지 직원에게 정확히 전달합니다.',
+    sampleVoice: '땅콩 알레르기가 있으니 조리 시 제외해 달라고 현지 스태프에게 명확하게 전달해 드리겠습니다.',
+    active: false
+  },
+  {
+    code: 'interp_5',
+    group: 'interpreter',
+    name: '다문화 가정 소통 브릿지 하나',
+    creator: 'OMNI Official',
+    price: 'FREE',
+    desc: '한국어와 타갈로그어, 영어를 쓰는 가족 구성원 간 대화와 학교 가정통신문을 따뜻하게 번역합니다.',
+    sampleVoice: '가족 모두의 마음이 오해 없이 따뜻하게 전해지도록 세 가지 언어로 부드럽게 이어드릴게요.',
     active: false
   }
 ];
@@ -251,7 +348,25 @@ export default function App() {
       return [];
     }
   });
-  const [modules, setModules] = useState(DEFAULT_MODULES);
+
+  // B2P2P 캐릭터 목록 상태 (초기 15종 + 사용자 출품 캐릭터 로컬 저장)
+  const [characters, setCharacters] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('omni_b2p2p_chars') || 'null');
+      return saved && saved.length > 0 ? saved : INITIAL_CHARACTERS;
+    } catch {
+      return INITIAL_CHARACTERS;
+    }
+  });
+  const [charFilter, setCharFilter] = useState('all');
+  const [showCreatorForm, setShowCreatorForm] = useState(false);
+  const [newChar, setNewChar] = useState({
+    name: '',
+    group: 'kids',
+    price: '1,500원',
+    desc: '',
+    sampleVoice: ''
+  });
 
   const [searchQuery, setSearchQuery] = useState('');
   const [searchAnswer, setSearchAnswer] = useState('');
@@ -263,7 +378,7 @@ export default function App() {
   const [kidName, setKidName] = useState('지우');
   const [storyTopic, setStoryTopic] = useState('용감한 아기 공룡과 제주 바다 탐험');
   const [generatedStory, setGeneratedStory] = useState('');
-  const [cctvStreamUrl, setCctvStreamUrl] = useState('rtsp://home-cam.local:8554/livingroom');
+  const [cctvStreamUrl, setCctvStreamUrl] = useState('rtsp://old-galaxy-cam.local:8554/kidsroom');
   const [cctvConnected, setCctvConnected] = useState(false);
 
   // 갤럭시 전방위 센서 상태
@@ -305,7 +420,6 @@ export default function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // 갤럭시 하드웨어 센서 통합 리스너
   useEffect(() => {
     const detected = [];
     if ('DeviceMotionEvent' in window) detected.push('Accelerometer/Gyro');
@@ -384,17 +498,50 @@ export default function App() {
     };
   }, []);
 
-  // 원격 동화 생성 및 음성 낭독 (Web Speech Synthesis)
-  function handlePlayKidsStory() {
-    const text = `옛날 옛적 푸른 바다가 반짝이는 마을에 호기심 많은 ${kidName}가 살고 있었어요. 오늘 ${kidName}는 '${storyTopic}' 모험을 떠나며 반짝이는 별빛 친구들을 만났답니다. 오늘도 건강하고 씩씩하게 자란 ${kidName}, 편안한 밤 되세요!`;
-    setGeneratedStory(text);
+  function speakText(text) {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
       const utter = new SpeechSynthesisUtterance(text);
       utter.lang = lang === 'en' ? 'en-US' : lang === 'tl' ? 'fil-PH' : 'ko-KR';
-      utter.rate = 0.92;
+      utter.rate = 0.95;
       window.speechSynthesis.speak(utter);
+    } else {
+      alert(text);
     }
+  }
+
+  function handlePlayKidsStory() {
+    const text = `옛날 옛적 푸른 바다가 반짝이는 마을에 호기심 많은 ${kidName}가 살고 있었어요. 오늘 ${kidName}는 '${storyTopic}' 모험을 떠나며 반짝이는 별빛 친구들을 만났답니다. 오늘도 건강하고 씩씩하게 자란 ${kidName}, 편안한 밤 되세요!`;
+    setGeneratedStory(text);
+    speakText(text);
+  }
+
+  function toggleCharacter(code) {
+    const updated = characters.map(c => c.code === code ? { ...c, active: !c.active } : c);
+    setCharacters(updated);
+    localStorage.setItem('omni_b2p2p_chars', JSON.stringify(updated));
+  }
+
+  function handlePublishCharacter() {
+    if (!newChar.name.trim() || !newChar.desc.trim()) {
+      return alert('캐릭터 이름과 설명을 입력해 주세요.');
+    }
+    const created = {
+      code: 'user_char_' + Date.now(),
+      group: newChar.group,
+      name: newChar.name,
+      creator: 'My Creator Studio (P2P)',
+      price: newChar.price || 'FREE',
+      desc: newChar.desc,
+      sampleVoice: newChar.sampleVoice || `안녕하세요! 새로 등록된 AI 비서 ${newChar.name}입니다.`,
+      active: true
+    };
+    const updated = [created, ...characters];
+    setCharacters(updated);
+    localStorage.setItem('omni_b2p2p_chars', JSON.stringify(updated));
+    setNewChar({ name: '', group: 'kids', price: '1,500원', desc: '', sampleVoice: '' });
+    setShowCreatorForm(false);
+    alert(`🎉 [${created.name}] 캐릭터가 B2P2P 마켓에 출품 및 장착되었습니다!`);
   }
 
   async function handleConnectBLEDevice() {
@@ -578,6 +725,8 @@ export default function App() {
 
   const totalCalories = healthLogs.filter(l => l.log_type === 'meal').reduce((acc, cur) => acc + (cur.calories || 0), 0);
   const waterCups = healthLogs.filter(l => l.log_type === 'water').length;
+  const activeCharacters = characters.filter(c => c.active);
+  const filteredCharacters = charFilter === 'all' ? characters : characters.filter(c => c.group === charFilter);
 
   const LanguageSelector = () => (
     <div className="flex items-center gap-1 bg-slate-800/90 border border-slate-700/80 rounded-full p-1">
@@ -763,9 +912,16 @@ export default function App() {
                 </span>
                 <span className="text-[11px] text-slate-300">{sensorData.isWarn ? t.postureWarn : t.postureOk}</span>
               </div>
-              <p className="text-xs text-slate-300 leading-relaxed">
-                Calories: <strong className="text-cyan-400">{totalCalories} kcal</strong> · Water: <strong className="text-blue-400">{waterCups}</strong> · Kids Care: <strong className="text-amber-300">Active</strong>
+              <p className="text-xs text-slate-300 leading-relaxed mb-2">
+                Calories: <strong className="text-cyan-400">{totalCalories} kcal</strong> · Water: <strong className="text-blue-400">{waterCups}</strong> · Active AI: <strong className="text-amber-300">{activeCharacters.length}</strong>
               </p>
+              <div className="flex flex-wrap gap-1">
+                {activeCharacters.map((c) => (
+                  <span key={c.code} className="text-[10px] bg-indigo-950/90 border border-indigo-500/30 text-indigo-200 px-2 py-0.5 rounded-full">
+                    ✨ {c.name}
+                  </span>
+                ))}
+              </div>
             </div>
 
             <div className="grid grid-cols-3 gap-2.5">
@@ -999,24 +1155,84 @@ export default function App() {
 
         {activeTab === 'store' && (
           <div className="space-y-4">
-            <div>
-              <div className="flex items-center justify-between">
-                <h2 className="text-sm font-bold text-white">{t.storeTitle}</h2>
-                <span className="text-[11px] text-cyan-400 font-semibold">{modules.filter(m => m.active).length}{t.activeCount}</span>
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <h2 className="text-sm font-bold text-white flex items-center gap-1.5">
+                  <Users className="w-4 h-4 text-cyan-400" /> {t.storeTitle}
+                </h2>
+                <p className="text-[11px] text-slate-400 mt-0.5">{t.storeSub}</p>
               </div>
-              <p className="text-[11px] text-slate-400 mt-0.5">{t.storeSub}</p>
+              <button
+                onClick={() => setShowCreatorForm(!showCreatorForm)}
+                className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold px-3 py-1.5 rounded-xl text-[11px] flex items-center gap-1 shrink-0 shadow-md"
+              >
+                <PlusCircle className="w-3.5 h-3.5" /> 내 캐릭터 출품
+              </button>
             </div>
 
-            {/* 키즈 & 패밀리 킬러 모듈 실시간 체험 카드 */}
+            {/* B2P2P 사용자 캐릭터 제작 및 출품 스튜디오 */}
+            {showCreatorForm && (
+              <div className="bg-slate-900 border border-cyan-500/50 rounded-2xl p-4 space-y-2.5">
+                <div className="text-xs font-bold text-cyan-300">✨ B2P2P 크리에이터 스튜디오 (새 AI 캐릭터 출품)</div>
+                <div className="grid grid-cols-3 gap-2">
+                  <input
+                    type="text"
+                    placeholder="캐릭터 이름"
+                    value={newChar.name}
+                    onChange={(e) => setNewChar({ ...newChar, name: e.target.value })}
+                    className="col-span-2 bg-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none"
+                  />
+                  <select
+                    value={newChar.group}
+                    onChange={(e) => setNewChar({ ...newChar, group: e.target.value })}
+                    className="bg-slate-800 rounded-xl px-2 py-2 text-xs text-white focus:outline-none"
+                  >
+                    <option value="kids">키즈</option>
+                    <option value="health">헬스</option>
+                    <option value="interpreter">통역</option>
+                  </select>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  <input
+                    type="text"
+                    placeholder="캐릭터 설명 및 역할"
+                    value={newChar.desc}
+                    onChange={(e) => setNewChar({ ...newChar, desc: e.target.value })}
+                    className="col-span-2 bg-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none"
+                  />
+                  <input
+                    type="text"
+                    placeholder="가격 (예: 1,500원)"
+                    value={newChar.price}
+                    onChange={(e) => setNewChar({ ...newChar, price: e.target.value })}
+                    className="bg-slate-800 rounded-xl px-2.5 py-2 text-xs text-white focus:outline-none"
+                  />
+                </div>
+                <input
+                  type="text"
+                  placeholder="미리듣기 샘플 대사 (음성으로 재생됩니다)"
+                  value={newChar.sampleVoice}
+                  onChange={(e) => setNewChar({ ...newChar, sampleVoice: e.target.value })}
+                  className="w-full bg-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none"
+                />
+                <button
+                  onClick={handlePublishCharacter}
+                  className="w-full bg-cyan-500 text-slate-950 font-bold py-2.5 rounded-xl text-xs"
+                >
+                  마켓에 즉시 출품 및 내 폰에 장착하기
+                </button>
+              </div>
+            )}
+
+            {/* 키즈 & 패밀리 케어 실시간 체험 허브 */}
             <div className="bg-gradient-to-br from-amber-950/30 via-slate-900 to-slate-900 border border-amber-500/40 rounded-2xl p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
                   <Baby className="w-4 h-4" /> 키즈 & 패밀리 케어 허브 (KIDS PACK)
                 </span>
-                <span className="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full font-semibold">CORE VALUE</span>
+                <span className="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full font-semibold">CORE</span>
               </div>
 
-              {/* 1. 원격 AI 동화 읽어주기 */}
               <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-3 space-y-2">
                 <div className="text-xs font-semibold text-white flex items-center gap-1.5">
                   <BookOpen className="w-3.5 h-3.5 text-amber-400" /> 원격 AI 맞춤 동화 읽어주기
@@ -1050,11 +1266,10 @@ export default function App() {
                 )}
               </div>
 
-              {/* 2. 오픈 홈 CCTV 직결 & 안전 상태 */}
               <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-3 space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-white flex items-center gap-1.5">
-                    <Video className="w-3.5 h-3.5 text-cyan-400" /> 오픈 홈 CCTV · 안전 모니터링
+                    <Video className="w-3.5 h-3.5 text-cyan-400" /> 구형폰 오픈 홈 CCTV · 안전 모니터링
                   </span>
                   <span className="text-[10px] text-emerald-400 flex items-center gap-1">
                     <ShieldCheck className="w-3 h-3" /> 안전존 정상
@@ -1076,42 +1291,82 @@ export default function App() {
                 </div>
                 {cctvConnected && (
                   <div className="bg-slate-900 border border-cyan-500/30 rounded-lg p-3 text-center">
-                    <div className="text-[11px] text-cyan-300 font-semibold">● LIVE OPEN STREAM CONNECTED</div>
+                    <div className="text-[11px] text-cyan-300 font-semibold">● LIVE SUB-PHONE CAM CONNECTED</div>
                     <div className="text-[10px] text-slate-400 mt-0.5">{cctvStreamUrl} · 움직임 및 울음소리 AI 감지 대기 중</div>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* 전체 모듈 카탈로그 */}
-            <div className="space-y-2.5">
-              {modules.map((mod, idx) => (
-                <div key={mod.code} className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center justify-between gap-3">
-                  <div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[10px] text-purple-400 font-medium">{mod.category}</span>
-                      <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold ${
-                        mod.tier === 'FREE FOREVER'
-                          ? 'bg-emerald-500/15 text-emerald-300'
-                          : mod.tier === 'KIDS PACK'
-                          ? 'bg-amber-500/15 text-amber-300'
-                          : 'bg-cyan-500/15 text-cyan-300'
-                      }`}>
-                        {mod.tier}
-                      </span>
-                    </div>
-                    <div className="text-xs font-bold text-white mt-1">{mod.name}</div>
-                    <div className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">{mod.desc}</div>
-                  </div>
+            {/* 카테고리 필터 탭 (전체 15+종) */}
+            <div className="flex items-center justify-between">
+              <div className="flex gap-1.5">
+                {[
+                  { id: 'all', label: `전체 (${characters.length})` },
+                  { id: 'kids', label: '키즈' },
+                  { id: 'health', label: '헬스' },
+                  { id: 'interpreter', label: '통역' },
+                ].map((tab) => (
                   <button
-                    onClick={() => {
-                      const updated = [...modules];
-                      updated[idx].active = !updated[idx].active;
-                      setModules(updated);
-                    }}
-                    className={`w-11 h-6 rounded-full transition-colors p-0.5 shrink-0 ${mod.active ? 'bg-cyan-500' : 'bg-slate-700'}`}
+                    key={tab.id}
+                    onClick={() => setCharFilter(tab.id)}
+                    className={`px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all ${
+                      charFilter === tab.id
+                        ? 'bg-cyan-500 text-slate-950'
+                        : 'bg-slate-900 text-slate-400 border border-slate-800'
+                    }`}
                   >
-                    <div className={`w-5 h-5 rounded-full bg-white transition-transform ${mod.active ? 'translate-x-5' : 'translate-x-0'}`} />
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+              <span className="text-[11px] text-cyan-400 font-semibold">{activeCharacters.length}{t.activeCount}</span>
+            </div>
+
+            {/* 오리지널 & P2P 캐릭터 카드 리스트 */}
+            <div className="space-y-2.5">
+              {filteredCharacters.map((char) => (
+                <div key={char.code} className="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-2.5">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold uppercase ${
+                          char.group === 'kids'
+                            ? 'bg-amber-500/20 text-amber-300'
+                            : char.group === 'health'
+                            ? 'bg-emerald-500/20 text-emerald-300'
+                            : 'bg-purple-500/20 text-purple-300'
+                        }`}>
+                          {char.group}
+                        </span>
+                        <span className="text-[10px] text-slate-400">by {char.creator}</span>
+                        <span className="text-[10px] font-bold text-cyan-400">· {char.price}</span>
+                      </div>
+                      <div className="text-xs font-bold text-white mt-1">{char.name}</div>
+                    </div>
+
+                    <button
+                      onClick={() => toggleCharacter(char.code)}
+                      className={`px-3 py-1.5 rounded-xl text-[11px] font-bold shrink-0 transition-all ${
+                        char.active
+                          ? 'bg-cyan-500 text-slate-950'
+                          : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                      }`}
+                    >
+                      {char.active ? '장착됨 ✓' : '장착하기'}
+                    </button>
+                  </div>
+
+                  <p className="text-[11px] text-slate-400 leading-relaxed">{char.desc}</p>
+
+                  <button
+                    onClick={() => speakText(char.sampleVoice)}
+                    className="w-full bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 rounded-xl px-3 py-2 text-[11px] text-slate-200 flex items-center justify-between"
+                  >
+                    <span className="truncate pr-2">"{char.sampleVoice}"</span>
+                    <span className="text-cyan-400 font-semibold flex items-center gap-1 shrink-0">
+                      <Play className="w-3 h-3" /> 미리듣기
+                    </span>
                   </button>
                 </div>
               ))}
