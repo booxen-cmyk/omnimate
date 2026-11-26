@@ -1,1 +1,8 @@
-
+{
+  "short_name": "OMNI-MATE",
+  "name": "OMNI-MATE 초개인화 AI 비서",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#090d16",
+  "background_color": "#090d16"
+}
