@@ -3,9 +3,13 @@ import { supabase } from './lib/supabase';
 import { analyzeMemoWithAI, analyzeMealWithAI, semanticSearchWithAI } from './lib/gemini';
 import {
   Home, FileText, HeartPulse, Store, Search, Mic, Send,
-  ShieldAlert, Smartphone, Droplets, Pill, Sparkles, CheckCircle2,
-  LogOut, Globe, Radio, Bluetooth, Watch, Cpu, ArrowDownToLine, Activity
+  ShieldAlert, Droplets, Pill, Sparkles, CheckCircle2,
+  LogOut, Globe, Radio, Bluetooth, Watch, Cpu, ArrowDownToLine,
+  Activity, BookOpen, Video, Baby, Volume2, ShieldCheck
 } from 'lucide-react';
+
+// [버전 관리] 0.1씩 조금씩 진화하는 빌드 체계
+const APP_VERSION = 'v0.3.5';
 
 // [테스트 모드 스위치] true: 로그인 생략 후 바로 입장 / false: 기존 로그인·회원가입 화면 활성화
 const BYPASS_AUTH = true;
@@ -14,14 +18,14 @@ const TRANSLATIONS = {
   ko: {
     selectLangTitle: '언어를 선택하세요',
     selectLangSub: '선택한 언어로 AI 비서가 즉시 시작됩니다.',
-    subtitle: '플랫폼 없이 내 폰에 바로 심는 초개인화 AI 비서',
+    subtitle: '광고 없이 내 갤럭시에 심는 오픈형 초개인화 AI 비서',
     emailPlaceholder: '이메일 주소',
     passwordPlaceholder: '비밀번호 (6자 이상)',
     loginBtn: '내 비서 시작하기 (로그인)',
     signupBtn: '새 계정 만들기 (무료 가입)',
-    permissionNote: '※ 갤럭시 안드로이드 표준 센서(모션·자이로·지자기·조도·BLE)와 직결되어 작동합니다.',
-    agentActive: 'GALAXY AI AGENT 상시 대기 (테스트)',
-    searchPlaceholder: '내 메모·식단·센서 기록이나 궁금한 점을 물어보세요',
+    permissionNote: '※ 배너 광고·결제 유도 없음. 갤럭시 표준 센서(모션·자이로·지자기·조도·BLE)와 직결됩니다.',
+    agentActive: `GALAXY AI AGENT 상시 대기 (${APP_VERSION})`,
+    searchPlaceholder: '내 메모·식단·센서·아이 케어 기록을 물어보세요',
     searchBtn: '검색',
     briefingTitle: '오늘의 AI 컨텍스트 브리핑',
     calLabel: '섭취 칼로리',
@@ -50,8 +54,9 @@ const TRANSLATIONS = {
     bleNone: '연결된 외부 기기 없음',
     rawIngestLabel: '오픈 데이터 패킷 수신기 (타사 워치·센서 JSON 아무 형식 입력)',
     rawIngestBtn: '오픈 데이터 자동 해석 및 반영',
-    storeTitle: '맞춤형 비서 모듈 스토어',
-    activeCount: '개 활성화됨',
+    storeTitle: '무광고 모듈형 비서 스토어',
+    storeSub: '기본 엔진은 평생 무료 · 필요한 키즈/전문가 모듈만 선택 장착',
+    activeCount: '개 장착됨',
     tabs: { home: '홈', memo: 'AI 메모', health: '갤럭시·기기', store: '비서 스토어' },
     postureWarn: '⚠️ 거북목 주의 각도',
     postureOk: '✅ 바른 자세 유지 중',
@@ -59,14 +64,14 @@ const TRANSLATIONS = {
   en: {
     selectLangTitle: 'Select Your Language',
     selectLangSub: 'Your AI assistant will start immediately in your chosen language.',
-    subtitle: 'Galaxy-First Hyper-Personalized AI Assistant',
+    subtitle: 'Ad-Free Open Hyper-Personalized Assistant for Galaxy',
     emailPlaceholder: 'Email address',
     passwordPlaceholder: 'Password (6+ chars)',
     loginBtn: 'Start My Assistant (Login)',
     signupBtn: 'Create New Account (Free)',
-    permissionNote: '※ Directly connects to Android Galaxy hardware sensors (Motion, Gyro, Mag, Light, BLE).',
-    agentActive: 'GALAXY AI AGENT ACTIVE (TEST)',
-    searchPlaceholder: 'Ask anything about your memos, meals, or sensors...',
+    permissionNote: '※ Zero ads or forced popups. Connects directly to Android Galaxy sensors & open BLE.',
+    agentActive: `GALAXY AI AGENT ACTIVE (${APP_VERSION})`,
+    searchPlaceholder: 'Ask anything about memos, meals, sensors, or kids care...',
     searchBtn: 'Ask',
     briefingTitle: "Today's AI Context Briefing",
     calLabel: 'Calories',
@@ -95,8 +100,9 @@ const TRANSLATIONS = {
     bleNone: 'No external device connected',
     rawIngestLabel: 'Open Payload Receiver (Paste any watch/sensor JSON or text)',
     rawIngestBtn: 'Auto-Parse & Ingest Open Data',
-    storeTitle: 'Modular Assistant Store',
-    activeCount: ' active',
+    storeTitle: 'Ad-Free Modular Assistant Store',
+    storeSub: 'Core engine free forever · Equip only the Kids & Pro packs you need',
+    activeCount: ' equipped',
     tabs: { home: 'Home', memo: 'AI Memo', health: 'Galaxy & IoT', store: 'Store' },
     postureWarn: '⚠️ Neck Tilt Warning',
     postureOk: '✅ Good Posture',
@@ -104,14 +110,14 @@ const TRANSLATIONS = {
   tl: {
     selectLangTitle: 'Piliin ang Iyong Wika',
     selectLangSub: 'Magsisimula agad ang iyong AI assistant sa napiling wika.',
-    subtitle: 'Personal na AI assistant para sa Samsung Galaxy',
+    subtitle: 'Walang Ads na Personal AI Assistant para sa Samsung Galaxy',
     emailPlaceholder: 'Email address',
     passwordPlaceholder: 'Password (6+ na karakter)',
     loginBtn: 'Simulan ang AI Assistant (Login)',
     signupBtn: 'Gumawa ng Bagong Account (Libre)',
-    permissionNote: '※ Direktang gumagamit ng mga sensor ng Android Galaxy (Motion, Gyro, Mag, Light, BLE).',
-    agentActive: 'GALAXY AI AGENT AKTIBO (TEST)',
-    searchPlaceholder: 'Magtanong tungkol sa iyong mga tala, pagkain, o sensor...',
+    permissionNote: '※ Walang ads. Direktang gumagamit ng mga sensor ng Android Galaxy at open BLE.',
+    agentActive: `GALAXY AI AGENT AKTIBO (${APP_VERSION})`,
+    searchPlaceholder: 'Magtanong tungkol sa tala, pagkain, sensor, o anak...',
     searchBtn: 'Hanapin',
     briefingTitle: 'Buod ng AI Ngayong Araw',
     calLabel: 'Kaloriya',
@@ -140,7 +146,8 @@ const TRANSLATIONS = {
     bleNone: 'Walang nakakonektang device',
     rawIngestLabel: 'Open Data Receiver (Maglagay ng anumang watch/sensor JSON)',
     rawIngestBtn: 'Awtomatikong Basahin at Itala',
-    storeTitle: 'Tindahan ng mga Modyul',
+    storeTitle: 'Walang-Ads na Tindahan ng Modyul',
+    storeSub: 'Libreng core engine · Piliin lamang ang Kids at Pro packs na kailangan',
     activeCount: ' aktibo',
     tabs: { home: 'Tahanan', memo: 'AI Tala', health: 'Galaxy·IoT', store: 'Tindahan' },
     postureWarn: '⚠️ Babala sa Postura ng Leeg',
@@ -155,12 +162,65 @@ const QUICK_MEALS = [
 ];
 
 const DEFAULT_MODULES = [
-  { code: 'galaxy_all_sensor', name: '갤럭시 하드웨어 풀-센서 엔진', desc: '가속도·자이로·중력·지자기·조도·기압계 통합 감시', category: '갤럭시 코어', active: true },
-  { code: 'open_ble_bridge', name: '유니버설 BLE 센서 브릿지', desc: '제조사 무관 표준 블루투스 워치·심박·환경센서 직결', category: '오픈 기기 연동', active: true },
-  { code: 'open_json_ingest', name: '오픈 웹훅·패킷 자동 해석기', desc: '타사 앱·IoT의 비정형 JSON 데이터를 AI가 자동 정규화', category: '오픈 기기 연동', active: true },
-  { code: 'turtle_neck', name: '거북목 경추 각도 알림', desc: '갤럭시 기울기 센서 기반 자세 경고', category: '헬스 가디언', active: true },
-  { code: 'fall_sos', name: '낙상·충격 감지 긴급 SOS', desc: '급격한 가속도 변화 시 비상 알림 발동', category: '안전·위험', active: true },
-  { code: 'eye_fatigue', name: '저조도 시력 보호 케어', desc: '조도 센서(Lux) 기반 어두운 화면 시청 경고', category: '갤럭시 코어', active: true },
+  // KIDS & FAMILY PACK (핵심 수익 모델)
+  {
+    code: 'kids_storyteller',
+    name: '원격 AI 맞춤 동화 읽어주기',
+    desc: '아이 이름·관심사를 넣어 즉석 동화를 짓고 부모 목소리 톤(TTS)으로 원격 낭독',
+    category: '키즈·패밀리 케어',
+    tier: 'KIDS PACK',
+    active: true
+  },
+  {
+    code: 'kids_home_cctv',
+    name: '오픈 홈 CCTV 직결 뷰어',
+    desc: '제조사 무관 IP카메라·구형폰 홈캠 스트림 연결 및 이상 움직임/울음소리 감지',
+    category: '키즈·패밀리 케어',
+    tier: 'KIDS PACK',
+    active: true
+  },
+  {
+    code: 'kids_safety_guard',
+    name: '아이 안전·등하원 안심 가디언',
+    desc: '키즈 워치·BLE 태그·스마트폰 센서 연동 실시간 안심존 및 긴급 호출',
+    category: '키즈·패밀리 케어',
+    tier: 'KIDS PACK',
+    active: true
+  },
+  // FREE FOREVER CORE (무광고 영구 무료 뼈대)
+  {
+    code: 'galaxy_all_sensor',
+    name: '갤럭시 하드웨어 풀-센서 엔진',
+    desc: '가속도·자이로·중력·지자기·조도·기압계 통합 감시',
+    category: '갤럭시 코어',
+    tier: 'FREE FOREVER',
+    active: true
+  },
+  {
+    code: 'open_ble_bridge',
+    name: '유니버설 오픈 BLE · JSON 브릿지',
+    desc: '제조사 API 제휴 없이 모든 스마트워치·센서 패킷 자동 수용',
+    category: '오픈 기기 연동',
+    tier: 'FREE FOREVER',
+    active: true
+  },
+  // PRO / CREATOR PACK (전문가·생활 특화 모듈)
+  {
+    code: 'multilingual_interpreter',
+    name: '3개국어(한·영·타갈로그) 실시간 통역 팩',
+    desc: '병원·관공서·로컬 생활 상황별 즉시 음성 통역 및 문화 가이드',
+    category: '글로벌 컨텐츠',
+    tier: 'PRO PACK',
+    active: false
+  },
+  {
+    code: 'bio_weather_coach',
+    name: '기압·조도 바이오리듬 코치',
+    desc: '갤럭시 기압계·조도 센서 기반 저기압 컨디션 및 수면 리듬 케어',
+    category: '헬스 스페셜',
+    tier: 'PRO PACK',
+    active: false
+  }
 ];
 
 const GUEST_SESSION = {
@@ -199,7 +259,14 @@ export default function App() {
   const [mealInput, setMealInput] = useState('');
   const [loadingAI, setLoadingAI] = useState(false);
 
-  // 갤럭시 전방위 센서 상태 (모션, 자이로, 중력, 방위/지자기, 조도)
+  // 키즈 케어 데모 상태 (원격 동화 & 홈 CCTV)
+  const [kidName, setKidName] = useState('지우');
+  const [storyTopic, setStoryTopic] = useState('용감한 아기 공룡과 제주 바다 탐험');
+  const [generatedStory, setGeneratedStory] = useState('');
+  const [cctvStreamUrl, setCctvStreamUrl] = useState('rtsp://home-cam.local:8554/livingroom');
+  const [cctvConnected, setCctvConnected] = useState(false);
+
+  // 갤럭시 전방위 센서 상태
   const [sensorData, setSensorData] = useState({
     tiltAngle: 15,
     rollAngle: 0,
@@ -238,7 +305,7 @@ export default function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // 갤럭시 하드웨어 센서 통합 리스너 (Legacy Motion/Orientation + W3C Generic Sensor API)
+  // 갤럭시 하드웨어 센서 통합 리스너
   useEffect(() => {
     const detected = [];
     if ('DeviceMotionEvent' in window) detected.push('Accelerometer/Gyro');
@@ -295,7 +362,6 @@ export default function App() {
       }));
     };
 
-    // 조도 센서 (삼성 인터넷 / 크롬 플래그 활성 기기)
     let lightSensor = null;
     if ('AmbientLightSensor' in window) {
       try {
@@ -304,9 +370,7 @@ export default function App() {
           setSensorData(prev => ({ ...prev, lightLux: Math.round(lightSensor.illuminance) }));
         });
         lightSensor.start();
-      } catch {
-        // 권한 미허용 시 조용히 패스
-      }
+      } catch {}
     }
 
     window.addEventListener('deviceorientation', handleOrientation);
@@ -320,7 +384,19 @@ export default function App() {
     };
   }, []);
 
-  // 표준 Web Bluetooth API를 통한 오픈 BLE 기기 스캔 및 연결
+  // 원격 동화 생성 및 음성 낭독 (Web Speech Synthesis)
+  function handlePlayKidsStory() {
+    const text = `옛날 옛적 푸른 바다가 반짝이는 마을에 호기심 많은 ${kidName}가 살고 있었어요. 오늘 ${kidName}는 '${storyTopic}' 모험을 떠나며 반짝이는 별빛 친구들을 만났답니다. 오늘도 건강하고 씩씩하게 자란 ${kidName}, 편안한 밤 되세요!`;
+    setGeneratedStory(text);
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = lang === 'en' ? 'en-US' : lang === 'tl' ? 'fil-PH' : 'ko-KR';
+      utter.rate = 0.92;
+      window.speechSynthesis.speak(utter);
+    }
+  }
+
   async function handleConnectBLEDevice() {
     if (!navigator.bluetooth) {
       return alert('이 브라우저는 Web Bluetooth를 지원하지 않습니다. 갤럭시 크롬 또는 삼성 인터넷에서 실행해 주세요.');
@@ -348,7 +424,6 @@ export default function App() {
     }
   }
 
-  // 어떤 형식의 외부 JSON/센서 데이터든 자동 파싱하여 OMNI-MATE 규격으로 흡수
   async function handleIngestOpenPacket() {
     if (!rawDevicePacket.trim()) return;
     try {
@@ -535,7 +610,7 @@ export default function App() {
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 mb-4">
             <Globe className="w-6 h-6 text-cyan-400" />
           </div>
-          <h1 className="text-xl font-bold text-white mb-1">OMNI-MATE</h1>
+          <h1 className="text-xl font-bold text-white mb-1">OMNI-MATE <span className="text-xs text-cyan-400">{APP_VERSION}</span></h1>
           <p className="text-xs text-slate-400 mb-6">
             언어 선택 / Select Language / Piliin ang Wika
           </p>
@@ -581,7 +656,7 @@ export default function App() {
               </h1>
             </div>
             <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2 py-0.5 rounded-full font-medium">
-              v0.4 Galaxy-Core
+              {APP_VERSION}
             </span>
           </div>
           <p className="text-xs text-slate-400 mb-6">{t.subtitle}</p>
@@ -641,7 +716,10 @@ export default function App() {
             <Radio className="w-3 h-3 text-emerald-400 animate-pulse shrink-0" />
             <span className="text-[10px] font-semibold tracking-wider text-emerald-400 truncate">{t.agentActive}</span>
           </div>
-          <h1 className="text-lg font-bold text-white">OMNI-MATE</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-lg font-bold text-white">OMNI-MATE</h1>
+            <span className="text-[10px] bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded">NO-ADS</span>
+          </div>
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
           <LanguageSelector />
@@ -686,7 +764,7 @@ export default function App() {
                 <span className="text-[11px] text-slate-300">{sensorData.isWarn ? t.postureWarn : t.postureOk}</span>
               </div>
               <p className="text-xs text-slate-300 leading-relaxed">
-                Calories: <strong className="text-cyan-400">{totalCalories} kcal</strong> · Water: <strong className="text-blue-400">{waterCups}</strong> · Galaxy Sensors: <strong className="text-emerald-400">{sensorData.supportedApis.length} Active</strong>
+                Calories: <strong className="text-cyan-400">{totalCalories} kcal</strong> · Water: <strong className="text-blue-400">{waterCups}</strong> · Kids Care: <strong className="text-amber-300">Active</strong>
               </p>
             </div>
 
@@ -787,7 +865,6 @@ export default function App() {
                 </button>
               </div>
 
-              {/* 감지된 갤럭시 하드웨어 API 배지 */}
               <div className="flex flex-wrap gap-1">
                 {sensorData.supportedApis.map((api, idx) => (
                   <span key={idx} className="text-[10px] bg-purple-950/80 border border-purple-500/30 text-purple-200 px-2 py-0.5 rounded-md">
@@ -921,30 +998,124 @@ export default function App() {
         )}
 
         {activeTab === 'store' && (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-bold text-white">{t.storeTitle}</h2>
-              <span className="text-[11px] text-cyan-400">{modules.filter(m => m.active).length}{t.activeCount}</span>
+          <div className="space-y-4">
+            <div>
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-bold text-white">{t.storeTitle}</h2>
+                <span className="text-[11px] text-cyan-400 font-semibold">{modules.filter(m => m.active).length}{t.activeCount}</span>
+              </div>
+              <p className="text-[11px] text-slate-400 mt-0.5">{t.storeSub}</p>
             </div>
-            {modules.map((mod, idx) => (
-              <div key={mod.code} className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center justify-between">
-                <div>
-                  <span className="text-[10px] text-purple-400 font-medium">{mod.category}</span>
-                  <div className="text-xs font-bold text-white mt-0.5">{mod.name}</div>
-                  <div className="text-[11px] text-slate-400 mt-0.5">{mod.desc}</div>
+
+            {/* 키즈 & 패밀리 킬러 모듈 실시간 체험 카드 */}
+            <div className="bg-gradient-to-br from-amber-950/30 via-slate-900 to-slate-900 border border-amber-500/40 rounded-2xl p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+                  <Baby className="w-4 h-4" /> 키즈 & 패밀리 케어 허브 (KIDS PACK)
+                </span>
+                <span className="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full font-semibold">CORE VALUE</span>
+              </div>
+
+              {/* 1. 원격 AI 동화 읽어주기 */}
+              <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-3 space-y-2">
+                <div className="text-xs font-semibold text-white flex items-center gap-1.5">
+                  <BookOpen className="w-3.5 h-3.5 text-amber-400" /> 원격 AI 맞춤 동화 읽어주기
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={kidName}
+                    onChange={(e) => setKidName(e.target.value)}
+                    placeholder="아이 이름"
+                    className="w-20 bg-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none"
+                  />
+                  <input
+                    type="text"
+                    value={storyTopic}
+                    onChange={(e) => setStoryTopic(e.target.value)}
+                    placeholder="동화 주제 입력"
+                    className="flex-1 bg-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none"
+                  />
                 </div>
                 <button
-                  onClick={() => {
-                    const updated = [...modules];
-                    updated[idx].active = !updated[idx].active;
-                    setModules(updated);
-                  }}
-                  className={`w-11 h-6 rounded-full transition-colors p-0.5 shrink-0 ${mod.active ? 'bg-cyan-500' : 'bg-slate-700'}`}
+                  onClick={handlePlayKidsStory}
+                  className="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2 rounded-lg text-xs flex items-center justify-center gap-1.5"
                 >
-                  <div className={`w-5 h-5 rounded-full bg-white transition-transform ${mod.active ? 'translate-x-5' : 'translate-x-0'}`} />
+                  <Volume2 className="w-3.5 h-3.5" /> 동화 생성 & 원격 음성 낭독 실행
                 </button>
+                {generatedStory && (
+                  <p className="text-[11px] text-amber-100/90 bg-slate-900 p-2.5 rounded-lg leading-relaxed">
+                    "{generatedStory}"
+                  </p>
+                )}
               </div>
-            ))}
+
+              {/* 2. 오픈 홈 CCTV 직결 & 안전 상태 */}
+              <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-white flex items-center gap-1.5">
+                    <Video className="w-3.5 h-3.5 text-cyan-400" /> 오픈 홈 CCTV · 안전 모니터링
+                  </span>
+                  <span className="text-[10px] text-emerald-400 flex items-center gap-1">
+                    <ShieldCheck className="w-3 h-3" /> 안전존 정상
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={cctvStreamUrl}
+                    onChange={(e) => setCctvStreamUrl(e.target.value)}
+                    className="flex-1 bg-slate-800 rounded-lg px-2.5 py-1.5 text-[11px] font-mono text-slate-200 focus:outline-none"
+                  />
+                  <button
+                    onClick={() => setCctvConnected(!cctvConnected)}
+                    className="bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-3 py-1.5 rounded-lg text-[11px] font-semibold shrink-0"
+                  >
+                    {cctvConnected ? '연결 끊기' : '홈캠 접속'}
+                  </button>
+                </div>
+                {cctvConnected && (
+                  <div className="bg-slate-900 border border-cyan-500/30 rounded-lg p-3 text-center">
+                    <div className="text-[11px] text-cyan-300 font-semibold">● LIVE OPEN STREAM CONNECTED</div>
+                    <div className="text-[10px] text-slate-400 mt-0.5">{cctvStreamUrl} · 움직임 및 울음소리 AI 감지 대기 중</div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* 전체 모듈 카탈로그 */}
+            <div className="space-y-2.5">
+              {modules.map((mod, idx) => (
+                <div key={mod.code} className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center justify-between gap-3">
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] text-purple-400 font-medium">{mod.category}</span>
+                      <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold ${
+                        mod.tier === 'FREE FOREVER'
+                          ? 'bg-emerald-500/15 text-emerald-300'
+                          : mod.tier === 'KIDS PACK'
+                          ? 'bg-amber-500/15 text-amber-300'
+                          : 'bg-cyan-500/15 text-cyan-300'
+                      }`}>
+                        {mod.tier}
+                      </span>
+                    </div>
+                    <div className="text-xs font-bold text-white mt-1">{mod.name}</div>
+                    <div className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">{mod.desc}</div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      const updated = [...modules];
+                      updated[idx].active = !updated[idx].active;
+                      setModules(updated);
+                    }}
+                    className={`w-11 h-6 rounded-full transition-colors p-0.5 shrink-0 ${mod.active ? 'bg-cyan-500' : 'bg-slate-700'}`}
+                  >
+                    <div className={`w-5 h-5 rounded-full bg-white transition-transform ${mod.active ? 'translate-x-5' : 'translate-x-0'}`} />
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </main>
