@@ -3,8 +3,128 @@ import { supabase } from './lib/supabase';
 import { analyzeMemoWithAI, analyzeMealWithAI, semanticSearchWithAI } from './lib/gemini';
 import {
   Home, FileText, HeartPulse, Store, Search, Mic, Send,
-  ShieldAlert, Smartphone, Droplets, Pill, Sparkles, CheckCircle2, LogOut
+  ShieldAlert, Smartphone, Droplets, Pill, Sparkles, CheckCircle2, LogOut, Globe, Radio
 } from 'lucide-react';
+
+// [테스트 모드 스위치] true: 로그인 생략 후 바로 입장 / false: 기존 로그인·회원가입 화면 활성화
+const BYPASS_AUTH = true;
+
+const TRANSLATIONS = {
+  ko: {
+    subtitle: '플랫폼 없이 내 폰에 바로 심는 초개인화 AI 비서',
+    emailPlaceholder: '이메일 주소',
+    passwordPlaceholder: '비밀번호 (6자 이상)',
+    loginBtn: '내 비서 시작하기 (로그인)',
+    signupBtn: '새 계정 만들기 (무료 가입)',
+    permissionNote: '※ 별도 앱 설치 없이 브라우저 표준 권한(음성·센서)만으로 안전하게 작동합니다.',
+    agentActive: 'AI 에이전트 상시 대기 중 (테스트 모드)',
+    searchPlaceholder: '내 메모·식단 기록이나 궁금한 점을 물어보세요',
+    searchBtn: '검색',
+    briefingTitle: '오늘의 AI 컨텍스트 브리핑',
+    calLabel: '섭취 칼로리',
+    waterLabel: '수분 섭취',
+    neckLabel: '경추 각도',
+    recentMemoTitle: '최근 AI 정리 메모',
+    memoHeader: '음성 · 텍스트 자동 요약 메모',
+    voiceBtn: '음성 입력',
+    memoPlaceholder: '회의 내용, 아이디어, 할 일을 두서없이 적어주세요. AI가 요약·태그·할 일을 자동 추출합니다.',
+    saveMemoBtn: 'AI 자동 정리 후 저장',
+    savingBtn: 'AI 분석 및 저장 중...',
+    mealHeader: 'AI 자연어 식단 & 칼로리 계산',
+    voiceMealBtn: '말로 기록',
+    mealPlaceholder: '예: 점심에 닭가슴살 샐러드랑 고구마 먹었어',
+    logBtn: '기록',
+    quickMealLabel: '원클릭 자주 먹는 식단',
+    waterBtn: '물 1잔 마시기',
+    suppBtn: '영양제 체크',
+    suppSub: '터치하여 복용 기록',
+    sensorHeader: '스마트폰 실시간 센서 가디언',
+    sosTestBtn: '낙상 SOS 테스트',
+    tiltLabel: '기울기(거북목 감지)',
+    accelLabel: '가속도(충격 감지)',
+    storeTitle: '맞춤형 비서 모듈 스토어',
+    activeCount: '개 활성화됨',
+    tabs: { home: '홈', memo: 'AI 메모', health: '건강·센서', store: '비서 스토어' },
+    postureWarn: '⚠️ 거북목 주의 각도',
+    postureOk: '✅ 바른 자세 유지 중',
+  },
+  en: {
+    subtitle: 'Hyper-personalized AI assistant directly on your phone',
+    emailPlaceholder: 'Email address',
+    passwordPlaceholder: 'Password (6+ chars)',
+    loginBtn: 'Start My Assistant (Login)',
+    signupBtn: 'Create New Account (Free)',
+    permissionNote: '※ Runs safely using standard mobile web permissions (Voice & Motion) without store approval.',
+    agentActive: 'AI AGENT ACTIVE (TEST MODE)',
+    searchPlaceholder: 'Ask anything about your memos or meal logs...',
+    searchBtn: 'Ask',
+    briefingTitle: "Today's AI Context Briefing",
+    calLabel: 'Calories',
+    waterLabel: 'Hydration',
+    neckLabel: 'Neck Angle',
+    recentMemoTitle: 'Recent AI Summaries',
+    memoHeader: 'Voice & Text Auto-Summary Memo',
+    voiceBtn: 'Voice Input',
+    memoPlaceholder: 'Jot down notes, ideas, or tasks freely. AI will extract summaries, tags, and to-dos.',
+    saveMemoBtn: 'Organize & Save with AI',
+    savingBtn: 'Analyzing with AI...',
+    mealHeader: 'AI Natural Language Meal Tracker',
+    voiceMealBtn: 'Voice Log',
+    mealPlaceholder: 'e.g., Had chicken breast salad and sweet potato for lunch',
+    logBtn: 'Log',
+    quickMealLabel: 'One-Tap Quick Meals',
+    waterBtn: 'Drink 1 Cup Water',
+    suppBtn: 'Daily Supplement',
+    suppSub: 'Tap to log intake',
+    sensorHeader: 'Mobile Live Sensor Guardian',
+    sosTestBtn: 'Test Fall SOS',
+    tiltLabel: 'Tilt (Posture Check)',
+    accelLabel: 'Accel (Impact Check)',
+    storeTitle: 'Modular Assistant Store',
+    activeCount: ' active',
+    tabs: { home: 'Home', memo: 'AI Memo', health: 'Health', store: 'Store' },
+    postureWarn: '⚠️ Neck Tilt Warning',
+    postureOk: '✅ Good Posture',
+  },
+  ja: {
+    subtitle: 'プラットフォーム不要、スマホに直接入れる超個人化AI秘書',
+    emailPlaceholder: 'メールアドレス',
+    passwordPlaceholder: 'パスワード（6文字以上）',
+    loginBtn: 'AI秘書を起動（ログイン）',
+    signupBtn: '新規アカウント作成（無料）',
+    permissionNote: '※ ストア審査不要でブラウザ標準権限（音声・センサー）のみで安全に動作します。',
+    agentActive: 'AIエージェント常時待機中（テスト）',
+    searchPlaceholder: 'メモや食事記録についてAIに質問する...',
+    searchBtn: '検索',
+    briefingTitle: '本日のAIコンテキストブリーフィング',
+    calLabel: '摂取カロリー',
+    waterLabel: '水分摂取',
+    neckLabel: '首の角度',
+    recentMemoTitle: '最近のAI要約メモ',
+    memoHeader: '音声・テキスト自動要約メモ',
+    voiceBtn: '音声入力',
+    memoPlaceholder: '会議内容やアイデアを自由に入力してください。AIが要約・タグ・ToDoを自動抽出します。',
+    saveMemoBtn: 'AI自動整理して保存',
+    savingBtn: 'AI分析・保存中...',
+    mealHeader: 'AI自然言語食事・カロリー計算',
+    voiceMealBtn: '音声で記録',
+    mealPlaceholder: '例：昼食にサラダチキンとさつまいもを食べた',
+    logBtn: '記録',
+    quickMealLabel: 'ワンタップ定番メニュー',
+    waterBtn: '水を1杯飲む',
+    suppBtn: 'サプリ記録',
+    suppSub: 'タップして摂取を記録',
+    sensorHeader: 'スマホリアルタイムセンサー',
+    sosTestBtn: '転倒SOSテスト',
+    tiltLabel: '傾き（ストレートネック検知）',
+    accelLabel: '加速度（衝撃検知）',
+    storeTitle: 'カスタム秘書モジュールストア',
+    activeCount: '個有効',
+    tabs: { home: 'ホーム', memo: 'AIメモ', health: '健康・センサー', store: 'ストア' },
+    postureWarn: '⚠️ 首の角度注意',
+    postureOk: '✅ 正しい姿勢を維持中',
+  }
+};
 
 const QUICK_MEALS = [
   { title: '도토리 얇은 면 냉국수', calories: 420, carbs: 72, protein: 14, fat: 6 },
@@ -14,21 +134,40 @@ const QUICK_MEALS = [
 
 const DEFAULT_MODULES = [
   { code: 'morning_brief', name: '모닝 데일리 브리핑', desc: '수면·일정·권장 칼로리 아침 요약', category: '생산성', active: true },
-  { code: 'turtle_neck', name: '거북목 경추 각도 알림', desc: '갤럭시 기울기 센서 기반 자세 경고', category: '갤럭시 센서', active: true },
+  { code: 'turtle_neck', name: '거북목 경추 각도 알림', desc: '스마트폰 기울기 센서 기반 자세 경고', category: '모바일 센서', active: true },
   { code: 'fall_sos', name: '낙상 충격 감지 SOS', desc: '급격한 가속도 변화 시 긴급 알림', category: '위험 알리미', active: true },
-  { code: 'eye_fatigue', name: '조도 기반 눈 피로 케어', desc: '어두운 환경 화면 시청 시간 경고', category: '갤럭시 센서', active: false },
+  { code: 'eye_fatigue', name: '조도 기반 눈 피로 케어', desc: '어두운 환경 화면 시청 시간 경고', category: '모바일 센서', active: false },
   { code: 'sub_guard', name: '구독 결제 방어막', desc: '정기 결제일 24시간 전 해지 확인', category: '소비·자산', active: false },
   { code: 'caffeine_cut', name: '카페인 반감기 알림', desc: '오후 시간대 추가 커피 섭취 경고', category: '건강·습관', active: true },
 ];
 
+const GUEST_SESSION = {
+  user: { id: 'guest-test-user', email: 'guest@omnimate.test' }
+};
+
 export default function App() {
-  const [session, setSession] = useState(null);
+  const [lang, setLang] = useState(() => localStorage.getItem('omni_lang') || 'ko');
+  const t = TRANSLATIONS[lang] || TRANSLATIONS.ko;
+
+  const [session, setSession] = useState(BYPASS_AUTH ? GUEST_SESSION : null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [activeTab, setActiveTab] = useState('home');
 
-  const [memos, setMemos] = useState([]);
-  const [healthLogs, setHealthLogs] = useState([]);
+  const [memos, setMemos] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('omni_guest_memos') || '[]');
+    } catch {
+      return [];
+    }
+  });
+  const [healthLogs, setHealthLogs] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('omni_guest_health') || '[]');
+    } catch {
+      return [];
+    }
+  });
   const [modules, setModules] = useState(DEFAULT_MODULES);
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -37,10 +176,17 @@ export default function App() {
   const [mealInput, setMealInput] = useState('');
   const [loadingAI, setLoadingAI] = useState(false);
 
-  const [sensorData, setSensorData] = useState({ tiltAngle: 15, lightLux: 320, accelPeak: 1.0, status: '정상 자세' });
+  const [sensorData, setSensorData] = useState({ tiltAngle: 15, accelPeak: 1.0, isWarn: true });
   const [sosTriggered, setSosTriggered] = useState(false);
 
+  function changeLanguage(newLang) {
+    setLang(newLang);
+    localStorage.setItem('omni_lang', newLang);
+  }
+
   useEffect(() => {
+    if (BYPASS_AUTH) return;
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (session) fetchUserData(session.user.id);
@@ -59,7 +205,7 @@ export default function App() {
       setSensorData(prev => ({
         ...prev,
         tiltAngle: beta,
-        status: isTurtleNeck ? '⚠️ 거북목 주의 각도' : '✅ 바른 자세 유지 중'
+        isWarn: isTurtleNeck
       }));
     };
 
@@ -103,7 +249,7 @@ export default function App() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) return alert('이 브라우저는 음성 인식을 지원하지 않습니다. (Chrome/삼성인터넷 권장)');
     const recognition = new SpeechRecognition();
-    recognition.lang = 'ko-KR';
+    recognition.lang = lang === 'en' ? 'en-US' : lang === 'ja' ? 'ja-JP' : 'ko-KR';
     recognition.onresult = (e) => targetSetter(e.results[0][0].transcript);
     recognition.start();
   }
@@ -113,16 +259,26 @@ export default function App() {
     setLoadingAI(true);
     try {
       const aiResult = await analyzeMemoWithAI(memoInput);
-      const { data, error } = await supabase.from('memos').insert([{
+      const newMemo = {
+        id: Date.now(),
         user_id: session.user.id,
         raw_content: memoInput,
         summary: aiResult.summary,
         tags: aiResult.tags || [],
         todos: aiResult.todos || []
-      }]).select();
-      if (!error && data) {
-        setMemos([data[0], ...memos]);
+      };
+
+      if (BYPASS_AUTH) {
+        const updated = [newMemo, ...memos];
+        setMemos(updated);
+        localStorage.setItem('omni_guest_memos', JSON.stringify(updated));
         setMemoInput('');
+      } else {
+        const { data, error } = await supabase.from('memos').insert([newMemo]).select();
+        if (!error && data) {
+          setMemos([data[0], ...memos]);
+          setMemoInput('');
+        }
       }
     } catch (e) {
       alert('AI 분석 중 오류가 발생했습니다. API 키를 확인하세요.');
@@ -135,7 +291,8 @@ export default function App() {
     setLoadingAI(true);
     try {
       const mealInfo = customMeal || await analyzeMealWithAI(mealInput);
-      const { data, error } = await supabase.from('health_logs').insert([{
+      const newLog = {
+        id: Date.now(),
         user_id: session.user.id,
         log_type: 'meal',
         title: mealInfo.title,
@@ -143,10 +300,19 @@ export default function App() {
         carbs: mealInfo.carbs,
         protein: mealInfo.protein,
         fat: mealInfo.fat
-      }]).select();
-      if (!error && data) {
-        setHealthLogs([data[0], ...healthLogs]);
+      };
+
+      if (BYPASS_AUTH) {
+        const updated = [newLog, ...healthLogs];
+        setHealthLogs(updated);
+        localStorage.setItem('omni_guest_health', JSON.stringify(updated));
         setMealInput('');
+      } else {
+        const { data, error } = await supabase.from('health_logs').insert([newLog]).select();
+        if (!error && data) {
+          setHealthLogs([data[0], ...healthLogs]);
+          setMealInput('');
+        }
       }
     } catch (e) {
       alert('식단 분석 오류: 입력 내용을 다시 확인해 주세요.');
@@ -155,12 +321,21 @@ export default function App() {
   }
 
   async function handleQuickHabit(type, title) {
-    const { data } = await supabase.from('health_logs').insert([{
+    const newLog = {
+      id: Date.now(),
       user_id: session.user.id,
       log_type: type,
       title
-    }]).select();
-    if (data) setHealthLogs([data[0], ...healthLogs]);
+    };
+
+    if (BYPASS_AUTH) {
+      const updated = [newLog, ...healthLogs];
+      setHealthLogs(updated);
+      localStorage.setItem('omni_guest_health', JSON.stringify(updated));
+    } else {
+      const { data } = await supabase.from('health_logs').insert([newLog]).select();
+      if (data) setHealthLogs([data[0], ...healthLogs]);
+    }
   }
 
   async function handleSemanticSearch() {
@@ -178,66 +353,118 @@ export default function App() {
   const totalCalories = healthLogs.filter(l => l.log_type === 'meal').reduce((acc, cur) => acc + (cur.calories || 0), 0);
   const waterCups = healthLogs.filter(l => l.log_type === 'water').length;
 
+  const LanguageSelector = () => (
+    <div className="flex items-center gap-1 bg-slate-800/90 border border-slate-700/80 rounded-full p-1">
+      <Globe className="w-3.5 h-3.5 text-cyan-400 ml-1.5 mr-0.5" />
+      {[
+        { code: 'ko', label: '한국어' },
+        { code: 'en', label: 'EN' },
+        { code: 'ja', label: '日本語' },
+      ].map((item) => (
+        <button
+          key={item.code}
+          onClick={() => changeLanguage(item.code)}
+          className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all ${
+            lang === item.code
+              ? 'bg-cyan-500 text-slate-950 shadow-sm'
+              : 'text-slate-400 hover:text-white'
+          }`}
+        >
+          {item.label}
+        </button>
+      ))}
+    </div>
+  );
+
+  // BYPASS_AUTH가 false일 때만 로그인/회원가입 화면 표시 (코드 보존)
   if (!session) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6 bg-[#090d16]">
-        <div className="w-full max-w-sm bg-slate-900/90 border border-slate-800 rounded-3xl p-7 shadow-2xl">
-          <div className="flex items-center gap-2 mb-2">
-            <Sparkles className="w-6 h-6 text-cyan-400" />
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-              OMNI-MATE
-            </h1>
+      <div className="min-h-[100dvh] flex flex-col items-center justify-center p-5 bg-[#090d16] select-none">
+        <div className="w-full max-w-sm mb-4 flex justify-end">
+          <LanguageSelector />
+        </div>
+
+        <div className="w-full max-w-sm bg-slate-900/95 border border-slate-800 rounded-3xl p-6 shadow-2xl">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-6 h-6 text-cyan-400" />
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+                OMNI-MATE
+              </h1>
+            </div>
+            <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2 py-0.5 rounded-full font-medium">
+              v0.2 Mobile
+            </span>
           </div>
-          <p className="text-xs text-slate-400 mb-6">플랫폼 없이 내 폰에 바로 심는 초개인화 AI 비서</p>
+          <p className="text-xs text-slate-400 mb-6">{t.subtitle}</p>
+
           <input
             type="email"
-            placeholder="이메일 주소"
+            placeholder={t.emailPlaceholder}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm mb-3 focus:outline-none focus:border-cyan-400"
+            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3.5 text-sm mb-3 focus:outline-none focus:border-cyan-400 text-white"
           />
           <input
             type="password"
-            placeholder="비밀번호 (6자 이상)"
+            placeholder={t.passwordPlaceholder}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm mb-5 focus:outline-none focus:border-cyan-400"
+            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3.5 text-sm mb-5 focus:outline-none focus:border-cyan-400 text-white"
           />
-          <button onClick={() => handleAuth('login')} className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 py-3 rounded-xl font-semibold text-sm mb-2">
-            내 비서 시작하기 (로그인)
+          <button
+            onClick={() => handleAuth('login')}
+            className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 active:scale-[0.99] py-3.5 rounded-xl font-bold text-sm text-white mb-2.5 shadow-lg shadow-cyan-500/20"
+          >
+            {t.loginBtn}
           </button>
-          <button onClick={() => handleAuth('signup')} className="w-full bg-slate-800 hover:bg-slate-700 py-2.5 rounded-xl text-xs text-slate-300">
-            새 계정 만들기 (무료 가입)
+          <button
+            onClick={() => handleAuth('signup')}
+            className="w-full bg-slate-800 hover:bg-slate-700 active:scale-[0.99] py-3 rounded-xl text-xs font-medium text-slate-300"
+          >
+            {t.signupBtn}
           </button>
+
+          <p className="text-[11px] text-slate-500 mt-5 leading-relaxed text-center">
+            {t.permissionNote}
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-md mx-auto min-h-screen bg-[#090d16] pb-24 relative">
+    <div className="max-w-md mx-auto min-h-[100dvh] bg-[#090d16] pb-24 relative">
       {sosTriggered && (
-        <div className="fixed inset-0 z-50 bg-red-950/90 flex flex-col items-center justify-center p-6 text-center">
+        <div className="fixed inset-0 z-50 bg-red-950/95 flex flex-col items-center justify-center p-6 text-center">
           <ShieldAlert className="w-16 h-16 text-red-400 animate-bounce mb-4" />
           <h2 className="text-2xl font-bold text-white mb-2">강한 충격(낙상) 감지됨!</h2>
           <p className="text-sm text-red-200 mb-6">30초 내 해제하지 않으면 등록된 비상 연락처로 현재 위치가 전송됩니다.</p>
-          <button onClick={() => setSosTriggered(false)} className="bg-white text-red-900 font-bold px-8 py-3 rounded-full">
+          <button onClick={() => setSosTriggered(false)} className="bg-white text-red-900 font-bold px-8 py-3.5 rounded-full">
             괜찮습니다 (경보 해제)
           </button>
         </div>
       )}
 
-      <header className="px-5 pt-6 pb-4 flex items-center justify-between border-b border-slate-800/80">
+      <header className="sticky top-0 z-30 bg-[#090d16]/90 backdrop-blur-md px-4 pt-4 pb-3 flex items-center justify-between border-b border-slate-800/80">
         <div>
-          <span className="text-[10px] font-semibold tracking-wider text-cyan-400 uppercase">Direct-to-User AI</span>
-          <h1 className="text-xl font-bold text-white">OMNI-MATE</h1>
+          <div className="flex items-center gap-1.5">
+            <Radio className="w-3 h-3 text-emerald-400 animate-pulse" />
+            <span className="text-[10px] font-semibold tracking-wider text-emerald-400">{t.agentActive}</span>
+          </div>
+          <h1 className="text-lg font-bold text-white">OMNI-MATE</h1>
         </div>
-        <button onClick={() => supabase.auth.signOut()} className="p-2 text-slate-400 hover:text-white">
-          <LogOut className="w-5 h-5" />
-        </button>
+        <div className="flex items-center gap-2">
+          <LanguageSelector />
+          {!BYPASS_AUTH && (
+            <button onClick={() => supabase.auth.signOut()} className="p-2 text-slate-400 hover:text-white">
+              <LogOut className="w-4 h-4" />
+            </button>
+          )}
+        </div>
       </header>
 
-      <main className="p-5 space-y-5">
+      <main className="p-4 space-y-4">
         {activeTab === 'home' && (
           <>
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-3">
@@ -245,14 +472,14 @@ export default function App() {
                 <Search className="w-4 h-4 text-cyan-400 shrink-0" />
                 <input
                   type="text"
-                  placeholder="내 메모·식단 기록이나 궁금한 점을 물어보세요"
+                  placeholder={t.searchPlaceholder}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSemanticSearch()}
                   className="bg-transparent text-xs w-full focus:outline-none text-white"
                 />
-                <button onClick={handleSemanticSearch} className="bg-cyan-500/20 text-cyan-400 px-2.5 py-1 rounded-lg text-xs font-medium shrink-0">
-                  검색
+                <button onClick={handleSemanticSearch} className="bg-cyan-500/20 text-cyan-400 px-3 py-1.5 rounded-lg text-xs font-semibold shrink-0">
+                  {t.searchBtn}
                 </button>
               </div>
               {searchAnswer && (
@@ -265,41 +492,41 @@ export default function App() {
             <div className="bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950/60 border border-indigo-500/30 rounded-2xl p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-semibold text-indigo-300 flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5" /> 오늘의 AI 컨텍스트 브리핑
+                  <Sparkles className="w-3.5 h-3.5" /> {t.briefingTitle}
                 </span>
-                <span className="text-[11px] text-slate-400">{sensorData.status}</span>
+                <span className="text-[11px] text-slate-300">{sensorData.isWarn ? t.postureWarn : t.postureOk}</span>
               </div>
               <p className="text-xs text-slate-300 leading-relaxed">
-                오늘 섭취 칼로리는 <strong className="text-cyan-400">{totalCalories} kcal</strong>(목표 2,000 kcal), 수분 섭취는 <strong className="text-blue-400">{waterCups}잔</strong>입니다. 저장된 메모는 총 <strong>{memos.length}건</strong>이 정리되어 있습니다.
+                Calories: <strong className="text-cyan-400">{totalCalories} kcal</strong> / 2,000 kcal · Water: <strong className="text-blue-400">{waterCups}</strong> · Memos: <strong>{memos.length}</strong>
               </p>
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-2.5">
               <div className="bg-slate-900 border border-slate-800 rounded-2xl p-3 text-center">
-                <div className="text-[11px] text-slate-400 mb-1">섭취 칼로리</div>
+                <div className="text-[11px] text-slate-400 mb-1">{t.calLabel}</div>
                 <div className="text-base font-bold text-emerald-400">{totalCalories}</div>
                 <div className="text-[10px] text-slate-500">/ 2,000 kcal</div>
               </div>
               <div className="bg-slate-900 border border-slate-800 rounded-2xl p-3 text-center">
-                <div className="text-[11px] text-slate-400 mb-1">수분 섭취</div>
-                <div className="text-base font-bold text-cyan-400">{waterCups} 잔</div>
-                <div className="text-[10px] text-slate-500">목표 8잔</div>
+                <div className="text-[11px] text-slate-400 mb-1">{t.waterLabel}</div>
+                <div className="text-base font-bold text-cyan-400">{waterCups}</div>
+                <div className="text-[10px] text-slate-500">Goal: 8</div>
               </div>
               <div className="bg-slate-900 border border-slate-800 rounded-2xl p-3 text-center">
-                <div className="text-[11px] text-slate-400 mb-1">경추 각도</div>
+                <div className="text-[11px] text-slate-400 mb-1">{t.neckLabel}</div>
                 <div className="text-base font-bold text-purple-400">{sensorData.tiltAngle}°</div>
-                <div className="text-[10px] text-slate-500">갤럭시 센서</div>
+                <div className="text-[10px] text-slate-500">Sensor</div>
               </div>
             </div>
 
             <div>
-              <h2 className="text-xs font-semibold text-slate-400 mb-2">최근 AI 정리 메모</h2>
+              <h2 className="text-xs font-semibold text-slate-400 mb-2">{t.recentMemoTitle}</h2>
               {memos.slice(0, 2).map((m) => (
                 <div key={m.id} className="bg-slate-900/70 border border-slate-800 rounded-xl p-3 mb-2">
                   <p className="text-xs text-slate-200 font-medium">{m.summary || m.raw_content}</p>
                   <div className="flex gap-1.5 mt-2">
-                    {m.tags?.map((t, idx) => (
-                      <span key={idx} className="text-[10px] bg-slate-800 text-cyan-400 px-2 py-0.5 rounded-full">#{t}</span>
+                    {m.tags?.map((tag, idx) => (
+                      <span key={idx} className="text-[10px] bg-slate-800 text-cyan-400 px-2 py-0.5 rounded-full">#{tag}</span>
                     ))}
                   </div>
                 </div>
@@ -312,24 +539,24 @@ export default function App() {
           <div className="space-y-4">
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-cyan-400">음성 · 텍스트 자동 요약 메모</span>
-                <button onClick={() => startVoiceInput(setMemoInput)} className="flex items-center gap-1 text-[11px] bg-purple-500/20 text-purple-300 px-2.5 py-1 rounded-full">
-                  <Mic className="w-3 h-3" /> 음성 입력
+                <span className="text-xs font-semibold text-cyan-400">{t.memoHeader}</span>
+                <button onClick={() => startVoiceInput(setMemoInput)} className="flex items-center gap-1 text-[11px] bg-purple-500/20 text-purple-300 px-3 py-1.5 rounded-full">
+                  <Mic className="w-3.5 h-3.5" /> {t.voiceBtn}
                 </button>
               </div>
               <textarea
                 rows={3}
-                placeholder="회의 내용, 아이디어, 할 일을 두서없이 적어주세요. AI가 요약·태그·할 일을 자동 추출합니다."
+                placeholder={t.memoPlaceholder}
                 value={memoInput}
                 onChange={(e) => setMemoInput(e.target.value)}
-                className="w-full bg-slate-800/70 rounded-xl p-3 text-xs text-white focus:outline-none mb-2"
+                className="w-full bg-slate-800/70 rounded-xl p-3 text-xs text-white focus:outline-none mb-2.5"
               />
               <button
                 onClick={handleSaveMemo}
                 disabled={loadingAI}
-                className="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5"
+                className="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-1.5"
               >
-                <Send className="w-3.5 h-3.5" /> {loadingAI ? 'AI 분석 및 저장 중...' : 'AI 자동 정리 후 저장'}
+                <Send className="w-3.5 h-3.5" /> {loadingAI ? t.savingBtn : t.saveMemoBtn}
               </button>
             </div>
 
@@ -362,25 +589,25 @@ export default function App() {
           <div className="space-y-4">
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-emerald-400">AI 자연어 식단 & 칼로리 계산</span>
-                <button onClick={() => startVoiceInput(setMealInput)} className="text-[11px] text-slate-400 flex items-center gap-1">
-                  <Mic className="w-3 h-3 text-emerald-400" /> 말로 기록
+                <span className="text-xs font-semibold text-emerald-400">{t.mealHeader}</span>
+                <button onClick={() => startVoiceInput(setMealInput)} className="text-[11px] text-slate-300 flex items-center gap-1 bg-slate-800 px-2.5 py-1 rounded-full">
+                  <Mic className="w-3 h-3 text-emerald-400" /> {t.voiceMealBtn}
                 </button>
               </div>
               <div className="flex gap-2 mb-3">
                 <input
                   type="text"
-                  placeholder="예: 점심에 닭가슴살 샐러드랑 고구마 먹었어"
+                  placeholder={t.mealPlaceholder}
                   value={mealInput}
                   onChange={(e) => setMealInput(e.target.value)}
-                  className="flex-1 bg-slate-800 rounded-xl px-3 py-2 text-xs focus:outline-none"
+                  className="flex-1 bg-slate-800 rounded-xl px-3 py-2.5 text-xs focus:outline-none text-white"
                 />
-                <button onClick={() => handleLogMeal()} disabled={loadingAI} className="bg-emerald-500 text-slate-950 font-bold px-3 rounded-xl text-xs">
-                  {loadingAI ? '...' : '기록'}
+                <button onClick={() => handleLogMeal()} disabled={loadingAI} className="bg-emerald-500 text-slate-950 font-bold px-3.5 rounded-xl text-xs">
+                  {loadingAI ? '...' : t.logBtn}
                 </button>
               </div>
 
-              <div className="text-[10px] text-slate-400 mb-1.5">원클릭 자주 먹는 식단</div>
+              <div className="text-[10px] text-slate-400 mb-1.5">{t.quickMealLabel}</div>
               <div className="flex gap-2 overflow-x-auto pb-1">
                 {QUICK_MEALS.map((qm, idx) => (
                   <button
@@ -395,19 +622,19 @@ export default function App() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <button onClick={() => handleQuickHabit('water', '물 1잔 (250ml)')} className="bg-slate-900 border border-slate-800 hover:border-cyan-500/50 rounded-2xl p-3 flex items-center gap-3">
-                <Droplets className="w-6 h-6 text-cyan-400" />
+            <div className="grid grid-cols-2 gap-2.5">
+              <button onClick={() => handleQuickHabit('water', 'Water 250ml')} className="bg-slate-900 border border-slate-800 active:scale-[0.98] rounded-2xl p-3.5 flex items-center gap-3">
+                <Droplets className="w-6 h-6 text-cyan-400 shrink-0" />
                 <div className="text-left">
-                  <div className="text-xs font-semibold">물 1잔 마시기</div>
-                  <div className="text-[10px] text-slate-400">오늘 {waterCups}잔 완료</div>
+                  <div className="text-xs font-semibold text-white">{t.waterBtn}</div>
+                  <div className="text-[10px] text-slate-400">{waterCups} cups</div>
                 </div>
               </button>
-              <button onClick={() => handleQuickHabit('supplement', '데일리 영양제 복용')} className="bg-slate-900 border border-slate-800 hover:border-purple-500/50 rounded-2xl p-3 flex items-center gap-3">
-                <Pill className="w-6 h-6 text-purple-400" />
+              <button onClick={() => handleQuickHabit('supplement', 'Daily Supplement')} className="bg-slate-900 border border-slate-800 active:scale-[0.98] rounded-2xl p-3.5 flex items-center gap-3">
+                <Pill className="w-6 h-6 text-purple-400 shrink-0" />
                 <div className="text-left">
-                  <div className="text-xs font-semibold">영양제 체크</div>
-                  <div className="text-[10px] text-slate-400">터치하여 복용 기록</div>
+                  <div className="text-xs font-semibold text-white">{t.suppBtn}</div>
+                  <div className="text-[10px] text-slate-400">{t.suppSub}</div>
                 </div>
               </button>
             </div>
@@ -415,20 +642,20 @@ export default function App() {
             <div className="bg-slate-900 border border-purple-500/30 rounded-2xl p-4">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-xs font-semibold text-purple-300 flex items-center gap-1.5">
-                  <Smartphone className="w-4 h-4" /> 갤럭시 실시간 센서 가디언
+                  <Smartphone className="w-4 h-4" /> {t.sensorHeader}
                 </span>
-                <button onClick={() => setSosTriggered(true)} className="text-[10px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full">
-                  낙상 SOS 테스트
+                <button onClick={() => setSosTriggered(true)} className="text-[10px] bg-red-500/20 text-red-400 px-2.5 py-1 rounded-full">
+                  {t.sosTestBtn}
                 </button>
               </div>
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div className="bg-slate-800/70 p-2.5 rounded-xl">
-                  <div className="text-[10px] text-slate-400">기울기(거북목 감지)</div>
-                  <div className="font-bold text-white mt-0.5">{sensorData.tiltAngle}° ({sensorData.status})</div>
+                  <div className="text-[10px] text-slate-400">{t.tiltLabel}</div>
+                  <div className="font-bold text-white mt-0.5">{sensorData.tiltAngle}° ({sensorData.isWarn ? t.postureWarn : t.postureOk})</div>
                 </div>
                 <div className="bg-slate-800/70 p-2.5 rounded-xl">
-                  <div className="text-[10px] text-slate-400">가속도(충격 감지)</div>
-                  <div className="font-bold text-white mt-0.5">{sensorData.accelPeak} G (정상)</div>
+                  <div className="text-[10px] text-slate-400">{t.accelLabel}</div>
+                  <div className="font-bold text-white mt-0.5">{sensorData.accelPeak} G</div>
                 </div>
               </div>
             </div>
@@ -438,8 +665,8 @@ export default function App() {
         {activeTab === 'store' && (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-bold text-white">맞춤형 비서 모듈 스토어</h2>
-              <span className="text-[11px] text-cyan-400">{modules.filter(m => m.active).length}개 활성화됨</span>
+              <h2 className="text-sm font-bold text-white">{t.storeTitle}</h2>
+              <span className="text-[11px] text-cyan-400">{modules.filter(m => m.active).length}{t.activeCount}</span>
             </div>
             {modules.map((mod, idx) => (
               <div key={mod.code} className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center justify-between">
@@ -454,7 +681,7 @@ export default function App() {
                     updated[idx].active = !updated[idx].active;
                     setModules(updated);
                   }}
-                  className={`w-11 h-6 rounded-full transition-colors p-0.5 ${mod.active ? 'bg-cyan-500' : 'bg-slate-700'}`}
+                  className={`w-11 h-6 rounded-full transition-colors p-0.5 shrink-0 ${mod.active ? 'bg-cyan-500' : 'bg-slate-700'}`}
                 >
                   <div className={`w-5 h-5 rounded-full bg-white transition-transform ${mod.active ? 'translate-x-5' : 'translate-x-0'}`} />
                 </button>
@@ -464,12 +691,12 @@ export default function App() {
         )}
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-slate-950/95 backdrop-blur border-t border-slate-800 px-6 py-3 flex justify-between">
+      <nav className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-slate-950/95 backdrop-blur-md border-t border-slate-800 px-6 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] flex justify-between">
         {[
-          { id: 'home', icon: Home, label: '홈' },
-          { id: 'memo', icon: FileText, label: 'AI 메모' },
-          { id: 'health', icon: HeartPulse, label: '건강·센서' },
-          { id: 'store', icon: Store, label: '비서 스토어' },
+          { id: 'home', icon: Home, label: t.tabs.home },
+          { id: 'memo', icon: FileText, label: t.tabs.memo },
+          { id: 'health', icon: HeartPulse, label: t.tabs.health },
+          { id: 'store', icon: Store, label: t.tabs.store },
         ].map((tab) => {
           const Icon = tab.icon;
           const active = activeTab === tab.id;
@@ -488,4 +715,3 @@ export default function App() {
     </div>
   );
 }
-
